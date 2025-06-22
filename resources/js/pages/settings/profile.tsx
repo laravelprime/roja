@@ -12,6 +12,14 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
@@ -22,6 +30,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     email: string;
+    phone: string;
+    role: string;
 };
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
@@ -30,6 +40,8 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
+        phone: auth.user.phone,
+        role: auth.user.role,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -80,6 +92,38 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             />
 
                             <InputError className="mt-2" message={errors.email} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Phone Number</Label>
+
+                            <Input
+                                id="phone"
+                                type="tel"
+                                className="mt-1 block w-full"
+                                value={data.phone}
+                                onChange={(e) => setData('phone', e.target.value)}
+                                required
+                                autoComplete="tel"
+                                placeholder="e.g. +263 78 456 7890"
+                            />
+
+                            <InputError className="mt-2" message={errors.phone} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="role">Role</Label>
+                            <Input
+                                id="role"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={data.role}
+                                onChange={(e) => setData('role', e.target.value)}
+                                required
+                                autoComplete="role"
+                                placeholder="Tenant"
+                                disabled
+                            />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
