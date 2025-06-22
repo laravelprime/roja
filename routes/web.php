@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Landlord\PropertyController;
+use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,12 +14,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::post('upload', [UploadController::class, 'store']);
+
     Route::group([
         'prefix' => 'landlord',
         'as' => 'landlord.',
     ],function () {
         Route::resource('properties', PropertyController::class)
-            ->only(['index']);
+            ->only(['index', 'store']);
     });
 });
 
