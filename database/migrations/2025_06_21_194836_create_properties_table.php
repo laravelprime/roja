@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('short_desc')->nullable();
             $table->text('description')->nullable();
             $table->string('city');
-            $table->string('neighborhood');
+            $table->string('neighbourhood');
             $table->enum('type', ['room', 'house']);
             $table->decimal('rent', 10, 2);
             $table->decimal('deposit', 10, 2)->nullable();

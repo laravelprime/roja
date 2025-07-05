@@ -1,11 +1,12 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Button } from "@/components/ui/button"
+import { Plus } from 'lucide-react';
 
 import FilterPane from './filter-pane';
 import PropertyCard from './property-card';
-import { AddProperty } from './add-property-dialog';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,7 +28,12 @@ export default function Index() {
                 <div className="flex flex-col-reverse items-start gap-2 md:flex-row md:justify-between">
                     <FilterPane/>                    
 
-                    <AddProperty/>
+                    <Link href="/landlord/properties/create">
+                        <Button variant="default" className='cursor-pointer'>
+                            <Plus/>
+                            Add Listing
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className='my-4'>

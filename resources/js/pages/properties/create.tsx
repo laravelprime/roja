@@ -1,18 +1,17 @@
+import Heading from '@/components/heading';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
+import { FormEventHandler, useState } from 'react';
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, X } from 'lucide-react';
 
 import FileUpload from "./file-upload";
-
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
 
 import {
     Select,
@@ -21,13 +20,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "@inertiajs/react";
-import { Plus, X } from 'lucide-react';
-import { FormEventHandler, useState } from "react";
 
 export type PropertyForm = {
     title: string;
@@ -49,7 +41,18 @@ export type PropertyForm = {
     }[];
 };
 
-export function AddProperty() {
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Properties',
+        href: '/landlord/properties',
+    },
+    {
+        title: 'Add Property',
+        href: '/landlord/properties/create',
+    }
+];
+
+export default function Index() {
     const [feature, setFeature] = useState('')
     const {data, setData, processing, errors, post, reset} = useForm<Required<PropertyForm>>({
         title: '',
@@ -90,10 +93,7 @@ export function AddProperty() {
         return true;
     };
 
-    console.log(errors);
-
     const submit: FormEventHandler = (e) => {
-        console.log(data);
         e.preventDefault();
         
         post(route('landlord.properties.store'),{
@@ -116,22 +116,14 @@ export function AddProperty() {
     }
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="default">
-                    <Plus/>
-                    Add Listing
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="md:max-w-2xl lg:max-w-5xl">
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Add Property" />
+            
+            <div className="px-4 py-6">
+                <Heading title="Add Property" description="Add your property's title, type, price and features" />
+
                 <form onSubmit={submit}>
-                    <DialogHeader>
-                        <DialogTitle>Add Property</DialogTitle>
-                        <DialogDescription>
-                            Add your property's title, type, price and features
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 h-60 md:h-72 lg:h-92 overflow-auto py-4">
+                    <div className="grid gap-4">
                         <div className="grid gap-3">
                             <Label htmlFor="title">Title</Label>
                             <Input 
@@ -218,33 +210,35 @@ export function AddProperty() {
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="rent">Rent</Label>
+                                <Label htmlFor="rent">Rent (USD)</Label>
                                 <Input 
                                     id="rent" 
                                     name="rent"
-                                    type="number"
+                                    type="text"
                                     // required
                                     autoFocus
                                     autoComplete="rent"
                                     value={data.rent}
-                                    onChange={ e => { setData('rent', parseFloat(e.target.value) || '') }} 
+                                    onChange={ e => { setData('rent', e.target.value === '' ? '' : parseFloat(e.target.value)) }} 
                                     disabled={processing}
+                                    placeholder="e.g. 150, 300 etc."
                                 />
                                 <InputError message={errors.rent} className="mt-2" />
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="deposit">Deposit</Label>
+                                <Label htmlFor="deposit">Deposit (USD)</Label>
                                 <Input 
                                     id="deposit" 
                                     name="deposit"
-                                    type="number"
+                                    type="text"
                                     // required
                                     autoFocus
                                     autoComplete="deposit"
                                     value={data.deposit}
-                                    onChange={ e => { setData('deposit', parseFloat(e.target.value) || '') }} 
+                                    onChange={ e => { setData('deposit', e.target.value === '' ? '' : parseFloat(e.target.value)) }} 
                                     disabled={processing}
+                                    placeholder="e.g. 0, 150 etc."
                                 />
                                 <InputError message={errors.deposit} className="mt-2" />
                             </div>
@@ -380,18 +374,19 @@ export function AddProperty() {
                             <InputError message={errors.imageIds} className="mt-2" />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button 
-                                variant="outline"
-                                onClick={() => reset()}
-                                disabled={processing}
-                            >Cancel</Button>
-                        </DialogClose>
+                    <div className='flex items-center justify-start gap-2 mt-4'>
+                        <Button 
+                            variant="outline"
+                            onClick={() => {
+                                reset()
+                                history.back()
+                            }}
+                            disabled={processing}
+                        >Cancel</Button>
                         <Button type="submit">Add Property</Button>
-                    </DialogFooter>
+                    </div>
                 </form>
-            </DialogContent>
-        </Dialog>
-    )
+            </div>
+        </AppLayout>
+    );
 }
