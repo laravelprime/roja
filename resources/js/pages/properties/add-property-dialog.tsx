@@ -36,10 +36,10 @@ export type PropertyForm = {
     city: string;
     neighbourhood: string;
     type: string;
-    rent: number;
-    deposit: number;
+    rent: number|string; // Use string to handle empty input
+    deposit: number|string; // Use string to handle empty input
     suitable_for: string;
-    availability: string;
+    availability_date: string;
     status: string;
     contact_number: string;
     features: string[];
@@ -58,10 +58,10 @@ export function AddProperty() {
         city: '',
         neighbourhood: '',
         type: '',
-        rent: 0,
-        deposit: 0,
+        rent: '',
+        deposit: '',
         suitable_for: '',
-        availability: '',
+        availability_date: '',
         status: '',
         contact_number: '',
         features: [],
@@ -90,10 +90,12 @@ export function AddProperty() {
         return true;
     };
 
+    console.log(errors);
+
     const submit: FormEventHandler = (e) => {
-        console.log('dsd');
-        
+        console.log(data);
         e.preventDefault();
+        
         post(route('landlord.properties.store'),{
             onSuccess: () => {
                 reset()
@@ -136,7 +138,7 @@ export function AddProperty() {
                                 id="title" 
                                 name="title"
                                 type="text"
-                                required
+                                // required
                                 autoFocus
                                 autoComplete="title"
                                 value={data.title}
@@ -153,7 +155,7 @@ export function AddProperty() {
                                 id="short_desc" 
                                 name="short_desc"
                                 type="text"
-                                required
+                                // required
                                 autoFocus
                                 autoComplete="short_desc"
                                 value={data.short_desc}
@@ -169,7 +171,7 @@ export function AddProperty() {
                             <Textarea
                                 id="description" 
                                 name="description"
-                                required
+                                // required
                                 autoFocus
                                 autoComplete="description"
                                 onChange={ e => { setData('description', e.target.value) }} 
@@ -187,7 +189,7 @@ export function AddProperty() {
                                     id="neighbourhood" 
                                     name="neighbourhood"
                                     type="text"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="neighbourhood"
                                     value={data.neighbourhood}
@@ -204,7 +206,7 @@ export function AddProperty() {
                                     id="city" 
                                     name="city"
                                     type="text"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="city"
                                     value={data.city}
@@ -221,11 +223,11 @@ export function AddProperty() {
                                     id="rent" 
                                     name="rent"
                                     type="number"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="rent"
                                     value={data.rent}
-                                    onChange={ e => { setData('rent', parseFloat(e.target.value) || 0) }} 
+                                    onChange={ e => { setData('rent', parseFloat(e.target.value) || '') }} 
                                     disabled={processing}
                                 />
                                 <InputError message={errors.rent} className="mt-2" />
@@ -237,11 +239,11 @@ export function AddProperty() {
                                     id="deposit" 
                                     name="deposit"
                                     type="number"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="deposit"
                                     value={data.deposit}
-                                    onChange={ e => { setData('deposit', parseFloat(e.target.value) || 0) }} 
+                                    onChange={ e => { setData('deposit', parseFloat(e.target.value) || '') }} 
                                     disabled={processing}
                                 />
                                 <InputError message={errors.deposit} className="mt-2" />
@@ -253,7 +255,7 @@ export function AddProperty() {
                                     id="suitable_for" 
                                     name="suitable_for"
                                     type="text"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="suitable_for"
                                     value={data.suitable_for}
@@ -265,20 +267,20 @@ export function AddProperty() {
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="availability">Availability</Label>
+                                <Label htmlFor="availability">Availability Date</Label>
                                 <Input 
-                                    id="availability" 
-                                    name="availability"
+                                    id="availabilityDate" 
+                                    name="availabilityDate"
                                     type="text"
-                                    required
+                                    // required
                                     autoFocus
-                                    autoComplete="availability"
-                                    value={data.availability}
-                                    onChange={ e => { setData('availability', e.target.value) }} 
+                                    autoComplete="availabilityDate"
+                                    value={data.availability_date}
+                                    onChange={ e => { setData('availability_date', e.target.value) }} 
                                     disabled={processing}
                                     placeholder="Now or Future Date"
                                 />
-                                <InputError message={errors.availability} className="mt-2" />
+                                <InputError message={errors.availability_date} className="mt-2" />
                             </div>
 
                             <div className="grid gap-3">
@@ -291,7 +293,7 @@ export function AddProperty() {
                                         <SelectValue placeholder="Status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="active">active</SelectItem>
+                                        <SelectItem value="available">available</SelectItem>
                                         <SelectItem value="rented">rented</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -304,7 +306,7 @@ export function AddProperty() {
                                     id="contact_number" 
                                     name="contact_number"
                                     type="text"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="contact_number"
                                     value={data.contact_number}
@@ -339,7 +341,7 @@ export function AddProperty() {
                                     id="feature" 
                                     name="feature"
                                     type="text"
-                                    required
+                                    // required
                                     autoFocus
                                     autoComplete="feature"
                                     value={feature}
@@ -350,7 +352,7 @@ export function AddProperty() {
                                     <Plus />
                                 </Button>
                             </div>
-                            <InputError message={errors.short_desc} className="mt-2" />
+                            <InputError message={errors.features} className="mt-2" />
                             <ul className="list-disc pl-5">
                                 {data.features.map((feature, index) => (
                                     <li key={index} className="text-sm text-muted-foreground">
@@ -365,6 +367,7 @@ export function AddProperty() {
                                                 <X />
                                             </Button>
                                         </div>
+                                        <InputError message={errors[`features.${index}`]} className="mt-2" />
                                     </li>
                                 ))}
                             </ul>
@@ -374,7 +377,7 @@ export function AddProperty() {
                             <Label htmlFor="description">Images of the Property</Label>
                             <p className="text-muted-foreground text-sm">At least 1 image of your property</p>
                             <FileUpload handleProcess={handleProcess} handleRemove={handleRemove}/>
-                            <InputError message={errors.description} className="mt-2" />
+                            <InputError message={errors.imageIds} className="mt-2" />
                         </div>
                     </div>
                     <DialogFooter>

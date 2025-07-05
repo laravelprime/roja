@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Landlord\PropertyController;
-use App\Http\Controllers\UploadController;
+use App\Http\Controllers\FilePondUploadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -14,7 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::post('upload', [UploadController::class, 'store']);
+    Route::post('upload', [FilePondUploadController::class, 'store']);
 
     Route::group([
         'prefix' => 'landlord',

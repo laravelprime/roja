@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class UploadController extends Controller
+class FilePondUploadController extends Controller
 {
     public function store(Request $request) {
         if($request->hasFile('image')) {

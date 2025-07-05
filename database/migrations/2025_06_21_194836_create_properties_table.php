@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
+            $table->text('short_desc')->nullable();
             $table->text('description')->nullable();
             $table->string('city');
             $table->string('neighborhood');
@@ -22,8 +23,8 @@ return new class extends Migration
             $table->decimal('rent', 10, 2);
             $table->decimal('deposit', 10, 2)->nullable();
             $table->string('suitable_for')->nullable();
-            $table->string('availability')->nullable();
-            $table->enum('status', ['active', 'rented'])->default('active');
+            $table->string('availability_date')->nullable();
+            $table->enum('status', ['available', 'rented'])->default('available');
             $table->string('contact_number')->nullable();
             $table->timestamps();
         });
