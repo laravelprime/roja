@@ -46,24 +46,27 @@ export default function PropertyCard({
                         <Badge variant="secondary">Unavailable</Badge>
                     }
                 </div>
-                <p className='font-semibold'>
-                    <span className='text-primary'>
-                        ${property.deposit}
-                    </span>
-                    <span className='ml-1 text-sm font-normal text-muted-foreground'>
-                        deposit
-                    </span>
-                </p>
+                <div className="flex items-center justify-between">
+                    <p className='font-semibold'>
+                        <span className='text-primary'>
+                            ${property.deposit}
+                        </span>
+                        <span className='ml-1 text-sm font-normal text-muted-foreground'>
+                            deposit
+                        </span>
+                    </p>
+                    <div className='flex items-center'>
+                        <Building2 size={16} className='mr-1'/>
+                        <p className='text-sm'>
+                            {property.city}
+                        </p>
+                    </div>
+                </div>
+                
                 <div className='flex items-center'>
                     <MapPin size={16} className='mr-1'/>
                     <p className='text-sm'>
                         {property.neighbourhood}
-                    </p>
-                </div>
-                <div className='flex items-center'>
-                    <Building2 size={16} className='mr-1'/>
-                    <p className='text-sm'>
-                        {property.city}
                     </p>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">
