@@ -21,7 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'as' => 'landlord.',
     ],function () {
         Route::resource('properties', PropertyController::class)
-            ->only(['index', 'store', 'create']);
+            ->only(['index', 'store', 'create', 'show']);
     });
 });
 

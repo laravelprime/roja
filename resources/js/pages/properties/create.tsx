@@ -1,7 +1,7 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Input } from "@/components/ui/input"
@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { set } from 'react-hook-form';
 
 export type PropertyForm = {
     title: string;
@@ -71,11 +72,19 @@ export default function Index() {
         imageIds: [],
     })
 
+    console.log(errors);
+    console.log(data);
+
     const handleProcess = (error: any, file: any) => {
         if (error) {
             console.error('Upload failed', error);
             return;
-        }      
+        }
+        
+        if(!file.serverId) {
+            console.error('Invalid file object: No server id returned', file);
+            return;
+        }
 
         const fileId = {
             id: file.id,
@@ -108,6 +117,7 @@ export default function Index() {
             return; // Do not add empty features
         }
         setData('features', [...data.features, feature]);
+        setFeature('');
     }
 
     const removeFeature = (index: number) => {
@@ -377,6 +387,7 @@ export default function Index() {
                     <div className='flex items-center justify-start gap-2 mt-4'>
                         <Button 
                             variant="outline"
+                            type='button'
                             onClick={() => {
                                 reset()
                                 history.back()

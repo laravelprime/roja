@@ -1,6 +1,6 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { Property, type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from "@/components/ui/button"
 import { Plus } from 'lucide-react';
@@ -15,8 +15,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function Index() {
-    const properties = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+interface IndexProps {
+    properties: Property[];
+}
+
+export default function Index({
+    properties
+}: IndexProps) {
+    console.log('Properties:', properties);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -43,12 +49,13 @@ export default function Index() {
                     }
                 </div>
 
-                <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-                    {properties.map((property, ndx) => (
-                        <PropertyCard
-                            key={ndx} 
-                            property={property}
-                        />
+                <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+                    {properties.map((property) => (
+                        <Link href={route('landlord.properties.show', property.id)} key={property.id}>
+                            <PropertyCard
+                                property={property}
+                            />
+                        </Link>
                     ))}
                 </div>
             </div>

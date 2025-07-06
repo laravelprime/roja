@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Landlord;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Landlord\StorePropertyRequest;
 use App\Models\Property;
+use App\Models\PropertyFeature;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PropertyController extends Controller
 {
@@ -15,7 +18,10 @@ class PropertyController extends Controller
     public function index()
     {
         return inertia('properties/index', [
-            'properties' => [],
+            'properties' => Property::where('user_id', Auth::id())
+                ->with(['media', 'features'])
+                ->orderBy('created_at', 'desc')
+                ->get()
         ]);
     }
 
@@ -34,26 +40,58 @@ class PropertyController extends Controller
     {
         $validated = $request->validated();
 
-        // Create a new Property object
-        $property = new Property();
+        try {
+            // Save Property Details
+            $property = new Property();
 
-        $property->user_id = auth()->id();
-        $property->title = $validated['title'];
-        $property->short_desc = $validated['short_desc'];
-        $property->description = $validated['description'] ?? '';
-        $property->city = $validated['city'];
-        $property->neighbourhood = $validated['neighbourhood'];
-        $property->type = $validated['type'];
-        $property->rent = $validated['rent'];
-        $property->deposit = $validated['deposit'] ?? 0;
-        $property->suitable_for = $validated['suitable_for'];
-        $property->availability_date = $validated['availability_date'];
-        $property->status = $validated['status'];
-        $property->contact_number = $validated['contact_number'];
+            $property->user_id = auth()->id();
+            $property->title = $validated['title'];
+            $property->short_desc = $validated['short_desc'];
+            $property->description = $validated['description'] ?? '';
+            $property->city = $validated['city'];
+            $property->neighbourhood = $validated['neighbourhood'];
+            $property->type = $validated['type'];
+            $property->rent = $validated['rent'];
+            $property->deposit = $validated['deposit'] ?? 0;
+            $property->suitable_for = $validated['suitable_for'];
+            $property->availability_date = $validated['availability_date'];
+            $property->status = $validated['status'];
+            $property->contact_number = $validated['contact_number'];
 
-        $property->save();        
+            $property->save();  
+            
+            // Save Property Features
+            if (!empty($validated['features'])) {
+                foreach ($validated['features'] as $feature) {
+                    $propertyFeature = new PropertyFeature();
+                    $propertyFeature->property_id = $property->id;
+                    $propertyFeature->feature = $feature;
+                    $propertyFeature->save();
+                }
+            }
 
-        dd($validated);
+            // Save Property Images
+            if (!empty($validated['imageIds'])) {
+                foreach ($validated['imageIds'] as $imageId) {
+                    $image = collect(\File::files(storage_path('app/private/tmp-files/' . $imageId['serverId'])))->first();
+                    $property->addMedia(storage_path('app/private/tmp-files/' . $imageId['serverId'] . '/' . $image->getFilename()))
+                        ->toMediaCollection('property_images');
+                    rmdir(storage_path('app/private/tmp-files/' . $imageId['serverId']));
+                }
+            }
+
+            return redirect()->route('landlord.properties.index')
+                ->with('success', 'Property listed successfully!');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Property creation failed: ' . $e->getMessage());
+
+            // Return error response
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['property_creation_error' => 'Failed to create property. Please try again.']);
+                return redirect()->back();
+        }
     }
 
     /**
