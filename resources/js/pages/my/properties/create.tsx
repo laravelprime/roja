@@ -1,7 +1,7 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 import { Input } from "@/components/ui/input"
@@ -20,7 +20,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { set } from 'react-hook-form';
+import { Checkbox } from '@/components/ui/checkbox';
+
 
 export type PropertyForm = {
     title: string;
@@ -33,8 +34,9 @@ export type PropertyForm = {
     deposit: number|string; // Use string to handle empty input
     suitable_for: string;
     availability_date: string;
-    status: string;
-    contact_number: string;
+    rental_status: string;
+    cell_number: string;
+    whatsapp_number: string;
     features: string[];
     imageIds: {
         id: string;
@@ -42,18 +44,25 @@ export type PropertyForm = {
     }[];
 };
 
+type PropertyFeature = {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Properties',
-        href: '/landlord/properties',
+        href: '/my/properties',
     },
     {
         title: 'Add Property',
-        href: '/landlord/properties/create',
+        href: '/my/properties/create',
     }
 ];
 
-export default function Index() {
+export default function Index({featuresList}: {featuresList: PropertyFeature[]}) {
     const [feature, setFeature] = useState('')
     const {data, setData, processing, errors, post, reset} = useForm<Required<PropertyForm>>({
         title: '',
@@ -66,14 +75,14 @@ export default function Index() {
         deposit: '',
         suitable_for: '',
         availability_date: '',
-        status: '',
-        contact_number: '',
+        rental_status: '',
+        cell_number: '',
+        whatsapp_number: '',
         features: [],
         imageIds: [],
     })
 
-    console.log(errors);
-    console.log(data);
+    console.log(errors)
 
     const handleProcess = (error: any, file: any) => {
         if (error) {
@@ -105,7 +114,7 @@ export default function Index() {
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         
-        post(route('landlord.properties.store'),{
+        post(route('my.properties.store'),{
             onSuccess: () => {
                 reset()
             }
@@ -288,37 +297,54 @@ export default function Index() {
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="status">Status</Label>
+                                <Label htmlFor="status">Rental Status</Label>
 
                                 <Select
-                                    onValueChange={(value) => { setData('status', value); }}
+                                    onValueChange={(value) => { setData('rental_status', value); }}
                                 >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Status" />
+                                        <SelectValue placeholder="Rental Status" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="available">available</SelectItem>
-                                        <SelectItem value="rented">rented</SelectItem>
+                                        <SelectItem value="occupied">occupied</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError message={errors.rental_status} className="mt-2" />
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="contact_number">Contact Number</Label>
+                                <Label htmlFor="cell_number">Cell Number</Label>
                                 <Input 
-                                    id="contact_number" 
-                                    name="contact_number"
+                                    id="cell_number" 
+                                    name="cell_number"
                                     type="text"
                                     // required
                                     autoFocus
-                                    autoComplete="contact_number"
-                                    value={data.contact_number}
-                                    onChange={ e => { setData('contact_number', e.target.value) }} 
+                                    autoComplete="cell_number"
+                                    value={data.cell_number}
+                                    onChange={ e => { setData('cell_number', e.target.value) }} 
                                     disabled={processing}
-                                    placeholder="Preferably Whatsapp No."
+                                    placeholder="e.g +263 77 212 3456"
                                 />
-                                <InputError message={errors.contact_number} className="mt-2" />
+                                <InputError message={errors.cell_number} className="mt-2" />
+                            </div>
+
+                            <div className="grid gap-3">
+                                <Label htmlFor="whatsapp_number">Whatsapp Number</Label>
+                                <Input 
+                                    id="whatsapp_number" 
+                                    name="whatsapp_number"
+                                    type="text"
+                                    // required
+                                    autoFocus
+                                    autoComplete="whatsapp_number"
+                                    value={data.whatsapp_number}
+                                    onChange={ e => { setData('whatsapp_number', e.target.value) }} 
+                                    disabled={processing}
+                                    placeholder="e.g +263 77 212 3456"
+                                />
+                                <InputError message={errors.whatsapp_number} className="mt-2" />
                             </div>
 
                             <div className="grid gap-3">
@@ -340,41 +366,24 @@ export default function Index() {
 
                         <div className="grid gap-3">
                             <Label htmlFor="feature">Features</Label>
-                            <div className="flex gap-2 lg:w-1/2">
-                                <Input 
-                                    id="feature" 
-                                    name="feature"
-                                    type="text"
-                                    // required
-                                    autoFocus
-                                    autoComplete="feature"
-                                    value={feature}
-                                    onChange={ e => { setFeature(e.target.value) }} 
-                                    disabled={processing}
-                                />
-                                <Button onClick={addFeature} type="button" disabled={processing}>
-                                    <Plus />
-                                </Button>
-                            </div>
-                            <InputError message={errors.features} className="mt-2" />
-                            <ul className="list-disc pl-5">
-                                {data.features.map((feature, index) => (
-                                    <li key={index} className="text-sm text-muted-foreground">
+                            <ul className="list-disc grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                {featuresList.map((feature) => (
+                                    <li key={feature.id} className="text-sm text-muted-foreground list-none inline-flex items-center space-x-2">
+                                        <Checkbox
+                                            checked={data.features.includes(String(feature.id))}
+                                            onCheckedChange={(checked) => {
+                                                checked ? setData('features', [...data.features, String(feature.id)])
+                                                    : setData('features', data.features.filter((value) => value !== String(feature.id)))
+                                                    
+                                            }}
+                                        />
                                         <div className="flex items-center">
-                                            {feature}
-                                            <Button 
-                                                variant="ghost" 
-                                                size="sm" 
-                                                className="ml-1"
-                                                onClick={() => removeFeature(index)}
-                                            >
-                                                <X />
-                                            </Button>
+                                            {feature.name}
                                         </div>
-                                        <InputError message={errors[`features.${index}`]} className="mt-2" />
                                     </li>
                                 ))}
                             </ul>
+                            <InputError message={errors.features} className="mt-2" />
                         </div>
 
                         <div className="grid gap-3">
@@ -397,6 +406,7 @@ export default function Index() {
                         <Button type="submit">Add Property</Button>
                     </div>
                 </form>
+
             </div>
         </AppLayout>
     );

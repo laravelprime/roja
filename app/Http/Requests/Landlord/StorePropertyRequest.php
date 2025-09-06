@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Landlord;
 
+use App\Models\PropertyFeature;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePropertyRequest extends FormRequest
 {
@@ -61,10 +63,15 @@ class StorePropertyRequest extends FormRequest
                     $fail('The availability date must be either "Now" or a valid date in DD/MM/YYYY format.');
                 }
             }],
-            'status' => 'required|string|in:available,rented',
-            'contact_number' => 'required|string|max:20',
-            'features' => 'nullable|array|max:20',
-            'features.*' => 'nullable|string|max:100',
+            'rental_status' => 'required|string|in:available,rented',
+            'cell_number' => 'required|string|max:20',
+            'whatsapp_number' => 'nullable|string|max:20',
+            'features' => 'required|array|max:20',
+            'features.*' => [
+                'required',
+                'string',
+                Rule::in(PropertyFeature::pluck('id')->map(fn($id) => (string)$id)->toArray()),
+            ],
             'imageIds' => 'required|array|min:4',
             'imageIds.*.id' => 'required|string',
             'imageIds.*.serverId' => ['required', 'string', function ($attribute, $value, $fail) {
@@ -87,7 +94,8 @@ class StorePropertyRequest extends FormRequest
             'availability_date.required' => 'The availability date is required.',
             'availability_date.string' => 'The availability date must be a string.',
             'imageIds.required' => 'You must upload at least 4 images showcasing your property.',
-            'imageIds.min' => 'You must upload at least 4 images showcasing your property.',
+            'imageIds.min' => 'You must upload 4 to 6 images showcasing your property.',
+            'features.required' => 'You must select at least 1 feature.',
             'features.max' => 'You can only provide up to 20 features.',
             'type.required' => 'The property type must be either a "room" or "a full house"',
             'type.in' => 'The property type must be either a "room" or "a full house"'

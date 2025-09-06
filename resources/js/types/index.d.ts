@@ -68,6 +68,14 @@ interface PropertyMedia {
     preview_url: string;
 }
 
+interface PropertyFeature {
+  id: number;
+  property_id: number;
+  feature: string;
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+};
+
 export interface Property {
     id: number;
     user_id: number;
@@ -86,5 +94,83 @@ export interface Property {
     created_at: string;
     updated_at: string;
     media: PropertyMedia[];
-    features: string[];
+    features: PropertyFeature[];
 }
+
+export interface PropertyFeature {
+    id: number;
+    feature: string;
+}
+
+export interface FiltersForm {
+    propertyType: string[];
+    city: string;
+    neighbourhood: string;
+    priceRange: [number, number];
+    depositRange: [number, number];
+    features: string[];
+    sortBy: string;
+}
+
+export interface LaravelPaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface LaravelPaginatedResponse<T> {
+    current_page: number;
+    data: T[];
+    first_page_url: string;
+    from: number | null;
+    last_page: number;
+    last_page_url: string;
+    links: LaravelPaginationLink[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number | null;
+    total: number;
+}
+
+export type Status = string[];
+export type PropertyType = Array<'house' | 'room'>;
+export type SortByOption = 'rent_low_to_high' | 'rent_high_to_low' | 'date_posted_newest' | 'date_posted_oldest' | 'neighbourhood_az' | 'neighbourhood_za'
+
+export type PropertyFilters = {
+    // Basic Filters
+    propertyType: PropertyType;
+    status: Status;
+    city: string;
+    neighbourhood: string;
+
+    // Price Range Filters
+    rentRange: {
+        min: number;
+        max: number;
+    };
+    depositRange: {
+        min: number;
+        max: number;
+    };
+
+    // Availability Filters
+    availabilityType: 'now' | 'soon' | 'future'
+    availableFromDate: string; // ISO date string
+    availableToDate: string; // ISO date string
+
+    // Demographic Filters
+    suitableFor: 'Family' | 'Couple' | 'Single Lady' | 'Single Male' | 'Students' | 'Any';
+
+    // Feature-based Filters
+    hasParking: boolean;
+    hasWiFi: boolean;
+    hasSecurity: boolean;
+    hasGarden: boolean;
+    hasSolarPower: boolean;
+    hasBorehole: boolean;
+
+    // Sort Options
+    sortBy: SortByOption;
+};

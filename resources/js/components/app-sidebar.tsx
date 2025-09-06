@@ -15,7 +15,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Properties',
-        href: '/landlord/properties',
+        href: route('my.properties.index'),
         icon: Home,
     },
 ];

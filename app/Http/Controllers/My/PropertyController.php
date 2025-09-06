@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Landlord;
+namespace App\Http\Controllers\My;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Landlord\StorePropertyRequest;
@@ -17,11 +17,12 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        return inertia('properties/index', [
-            'properties' => Property::where('user_id', Auth::id())
+        return inertia('my/properties/index', [
+            'properties' => Auth::user()
+                ->properties()
                 ->with(['media', 'features'])
                 ->orderBy('created_at', 'desc')
-                ->get()
+                ->paginate(10)
         ]);
     }
 
@@ -30,14 +31,19 @@ class PropertyController extends Controller
      */
     public function create()
     {
-        return inertia('properties/create');
+        return inertia('my/properties/create', [
+            'featuresList' => PropertyFeature::all()
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StorePropertyRequest $request)
+    // public function store(Request $request)
     {
+        dd($request->all());
+        
         $validated = $request->validated();
 
         try {
@@ -80,7 +86,7 @@ class PropertyController extends Controller
                 }
             }
 
-            return redirect()->route('landlord.properties.index')
+            return redirect()->route('my.properties.index')
                 ->with('success', 'Property listed successfully!');
         } catch (\Exception $e) {
             // Log the error
