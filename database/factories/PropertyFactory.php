@@ -47,6 +47,10 @@ class PropertyFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create([
+            'role' => 'user',
+        ]);
+
         $type = $this->faker->randomElement(['house', 'room']);
         $neighbourhood = $this->faker->randomElement($this->harareNeighbourhoods);
         $title = $type === 'house' 
@@ -68,23 +72,28 @@ class PropertyFactory extends Factory
             $this->faker->dateTimeBetween('now', '+90 days')->format('d/m/Y')
         ]);
 
+        $cellNumber = '+263 ' . $this->faker->randomElement(['77', '71', '78', '73']) . ' ' . $this->faker->numerify('### ####');
+
+        $suitableFor = $this->faker->randomElement([
+            'Single Professional', 'Couple', 'Family', 'Students', 
+            'Working Professional', 'Small Family', 'Anyone'
+        ]);
+
         return [
-            'user_id' => User::factory(),
+            'user_id' => $user->id,
             'title' => $title,
             'short_desc' => $title . ' in ' . $neighbourhood,
-            'description' => $this->faker->paragraph(3) . ' Located in ' . $neighbourhood . '. Perfect for ' . $this->faker->randomElement(['professionals', 'families', 'students', 'couples']) . '. Close to amenities and transport.',
+            'description' => $this->faker->paragraph(3) . ' Located in ' . $neighbourhood . '. Perfect for ' . strtolower($suitableFor) . '. Close to amenities and transport.',
             'city' => 'Harare',
             'neighbourhood' => $neighbourhood,
             'type' => $type,
             'rent' => $rent,
             'deposit' => $deposit,
-            'suitable_for' => $this->faker->randomElement([
-                'Single Professional', 'Couple', 'Family', 'Students', 
-                'Working Professional', 'Small Family', 'Anyone'
-            ]),
+            'suitable_for' => $suitableFor,
             'availability_date' => $availabilityDate,
-            'status' => $this->faker->randomElement(['available', 'available', 'available', 'available', 'rented']), // 80% available
-            'contact_number' => '+263 ' . $this->faker->randomElement(['77', '71', '78', '73']) . ' ' . $this->faker->numerify('### ####'),
+            'rental_status' => $this->faker->randomElement(['available', 'available', 'available', 'available', 'occupied']), // 80% available
+            'cell_number' => $cellNumber,
+            'whatsapp_number' => $cellNumber,
             'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
             'updated_at' => now(),
         ];

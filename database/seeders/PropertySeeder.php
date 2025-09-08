@@ -15,24 +15,17 @@ class PropertySeeder extends Seeder
      */
     public function run(): void
     {
-        $landlords = User::factory()->count(10)->create([
-            'role' => 'landlord',
+        $users = User::factory()->count(10)->create([
+            'role' => 'user',
         ]);   
         
         $properties = Property::factory()
             ->count(100)
-            ->recycle($landlords)
+            ->recycle($users)
             ->create();
 
         foreach ($properties as $property) {
             if($property->type = 'house'){
-                PropertyFeature::factory()
-                    ->count(rand(4, 16))
-                    ->houseFeature()
-                    ->create([
-                        'property_id' => $property->id,
-                    ]);
-
                 // Copy house images and assign to property using spatie
                 $houses_path = 'C:\Users\comfo\Documents\Web Dev\LARAVEL PRIME\roja test assets\houses';
                 $images = collect(scandir($houses_path))
@@ -46,13 +39,6 @@ class PropertySeeder extends Seeder
                         ->toMediaCollection('property_images');
                 }
             } else {
-                PropertyFeature::factory()
-                    ->count(rand(4, 16))
-                    ->roomFeature()
-                    ->create([
-                        'property_id' => $property->id,
-                    ]);
-
                 // Copy room images and assign to property using spatie
                 $rooms_path = 'C:\Users\comfo\Documents\Web Dev\LARAVEL PRIME\roja test assets\rooms';
 

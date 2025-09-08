@@ -16,6 +16,6 @@ class Property extends Model implements HasMedia
      */
     public function features()
     {
-        return $this->hasMany(PropertyFeature::class); 
+        return $this->belongsToMany(PropertyFeature::class, 'property_feature_properties'); 
     }
 }

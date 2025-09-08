@@ -23,9 +23,10 @@ return new class extends Migration
             $table->decimal('rent', 10, 2);
             $table->decimal('deposit', 10, 2)->nullable();
             $table->string('suitable_for')->nullable();
-            $table->string('availability_date')->nullable();
-            $table->enum('status', ['available', 'rented'])->default('available');
-            $table->string('contact_number')->nullable();
+            $table->date('availability_date')->nullable();
+            $table->enum('rental_status', ['available', 'occupied'])->default('available');
+            $table->string('cell_number')->nullable();
+            $table->string('whatsapp_number')->nullable();
             $table->timestamps();
         });
     }

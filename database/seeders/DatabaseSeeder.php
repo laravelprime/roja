@@ -21,7 +21,9 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            PropertyFeatureSeeder::class,
             PropertySeeder::class,
+            PropertyFeaturePropertySeeder::class,
         ]);
     }
 }

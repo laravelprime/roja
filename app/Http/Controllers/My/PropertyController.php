@@ -40,10 +40,7 @@ class PropertyController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StorePropertyRequest $request)
-    // public function store(Request $request)
     {
-        dd($request->all());
-        
         $validated = $request->validated();
 
         try {
@@ -61,8 +58,9 @@ class PropertyController extends Controller
             $property->deposit = $validated['deposit'] ?? 0;
             $property->suitable_for = $validated['suitable_for'];
             $property->availability_date = $validated['availability_date'];
-            $property->status = $validated['status'];
-            $property->contact_number = $validated['contact_number'];
+            $property->status = $validated['rental_status'];
+            $property->cell_number = $validated['cell_number'];
+            $property->whatsapp_number = $validated['cell_number'];
 
             $property->save();  
             
