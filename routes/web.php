@@ -27,7 +27,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'as' => 'my.',
     ],function () {
         Route::resource('properties', MyPropertyController::class)
-            ->only(['index', 'store', 'create', 'show']);
+            ->only(['index', 'store', 'create', 'edit', 'destroy', 'update']);
+
+        Route::delete('properties/{property}/media/{media}', [MyPropertyController::class, 'destroyMedia'])
+            ->name('properties.media.destroy');
+        
+        Route::post('properties/{property}/media/{media}/featured', [MyPropertyController::class, 'setFeaturedImage'])
+            ->name('properties.media.featured');
 
         Route::get('dashboard', function () {
             return Inertia::render('dashboard');

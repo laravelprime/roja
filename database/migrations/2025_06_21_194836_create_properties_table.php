@@ -27,6 +27,7 @@ return new class extends Migration
             $table->enum('rental_status', ['available', 'occupied'])->default('available');
             $table->string('cell_number')->nullable();
             $table->string('whatsapp_number')->nullable();
+            $table->unsignedBigInteger('featured_image_id')->nullable();
             $table->timestamps();
         });
     }

@@ -26,7 +26,11 @@ export default function PropertyCard({
         <CardContent className='px-4'>
             <div className="w-full aspect-[16/9] overflow-hidden rounded-md bg-muted">
                 <img
-                    src={property.media[0].original_url}
+                    src={
+                        property.featured_image_id
+                            ? property.media.find(media => media.id === property.featured_image_id)?.original_url
+                            : property.media[0]?.original_url
+                    }
                     alt="House image"
                     className="w-full h-full object-cover"
                 />
@@ -41,7 +45,7 @@ export default function PropertyCard({
                             per month
                         </span>
                     </p>
-                    {property.status === 'available' ?
+                    {property.rental_status === 'available' ?
                         <Badge variant="default">Available</Badge> :
                         <Badge variant="secondary">Unavailable</Badge>
                     }

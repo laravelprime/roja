@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import { useEffect, useState } from 'react';
 
 // Import React FilePond
 import { FilePond, registerPlugin } from 'react-filepond';
-import { FilePondFile, FilePondInitialFile } from 'filepond';
 import { usePage } from '@inertiajs/react';
 
 // Import FilePond styles
@@ -23,15 +21,23 @@ registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 // Our app
 interface FileUploadProps {
     handleProcess: any,
-    handleRemove?: any
+    handleRemove?: any,
+    resetTrigger: boolean
 }
 
 export default function FileUpload({
     handleProcess,
-    handleRemove
+    handleRemove,
+    resetTrigger = false
 }: FileUploadProps) {
     const [files, setFiles] = useState([]);
     const { csrf_token } = usePage<SharedData>().props;
+
+    useEffect(() => {
+        if (resetTrigger) {
+            setFiles([]);
+        }
+    }, [resetTrigger]);
 
     return (
         <div>

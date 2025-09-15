@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Landlord;
+namespace App\Http\Requests\My;
 
 use App\Models\PropertyFeature;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePropertyRequest extends FormRequest
+class UpdatePropertyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -63,7 +63,7 @@ class StorePropertyRequest extends FormRequest
                     $fail('The availability date must be either "Now" or a valid date in DD/MM/YYYY format.');
                 }
             }],
-            'rental_status' => 'required|string|in:available,rented',
+            'rental_status' => 'required|string|in:available,occupied',
             'cell_number' => 'required|string|max:20',
             'whatsapp_number' => 'nullable|string|max:20',
             'features' => 'required|array|max:20',
@@ -72,14 +72,35 @@ class StorePropertyRequest extends FormRequest
                 'string',
                 Rule::in(PropertyFeature::pluck('id')->map(fn($id) => (string)$id)->toArray()),
             ],
-            'imageIds' => 'required|array|min:4',
-            'imageIds.*.id' => 'required|string',
-            'imageIds.*.serverId' => ['required', 'string', function ($attribute, $value, $fail) {
-                $tempFilePath = storage_path('app/private/tmp-files/' . $value);
-                if (!file_exists($tempFilePath)) {
-                    $fail('The uploaded image file does not exist or has expired.');
+            'imageIds' => [
+                'nullable',
+                'array',
+            ],
+            'newImageIds' => [
+                'nullable',
+                'array',
+                // Custom rule to ensure total images <= 8
+                function ($attribute, $value, $fail) {
+                    $oldImages = is_array(request('imageIds')) ? count(request('imageIds')) : 0;
+                    $newImages = is_array($value) ? count($value) : 0;
+                    if (($oldImages + $newImages) > 8) {
+                        $fail('You can only provide up to 8 images in total (existing + new).');
+                    } elseif (($oldImages + $newImages) < 4) {
+                        $fail('You must provide at least 4 images in total (existing + new).');
+                    }
                 }
-            }]
+            ],
+            'newImageIds.*.id' => 'required|string',
+            'newImageIds.*.serverId' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $tempFilePath = storage_path('app/private/tmp-files/' . $value);
+                    if (!file_exists($tempFilePath)) {
+                        $fail('The uploaded image file does not exist or has expired.');
+                    }
+                }
+            ]
         ];
     }
 

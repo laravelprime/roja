@@ -47,10 +47,6 @@ class PropertyFactory extends Factory
      */
     public function definition(): array
     {
-        $user = User::factory()->create([
-            'role' => 'user',
-        ]);
-
         $type = $this->faker->randomElement(['house', 'room']);
         $neighbourhood = $this->faker->randomElement($this->harareNeighbourhoods);
         $title = $type === 'house' 
@@ -80,7 +76,7 @@ class PropertyFactory extends Factory
         ]);
 
         return [
-            'user_id' => $user->id,
+            'user_id' => User::factory(),
             'title' => $title,
             'short_desc' => $title . ' in ' . $neighbourhood,
             'description' => $this->faker->paragraph(3) . ' Located in ' . $neighbourhood . '. Perfect for ' . strtolower($suitableFor) . '. Close to amenities and transport.',
@@ -94,6 +90,7 @@ class PropertyFactory extends Factory
             'rental_status' => $this->faker->randomElement(['available', 'available', 'available', 'available', 'occupied']), // 80% available
             'cell_number' => $cellNumber,
             'whatsapp_number' => $cellNumber,
+            'featured_image_id' => null,
             'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
             'updated_at' => now(),
         ];

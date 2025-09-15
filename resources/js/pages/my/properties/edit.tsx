@@ -1,7 +1,7 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
-import { SharedData, type BreadcrumbItem } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Property, SharedData, type BreadcrumbItem } from '@/types';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea";
-import { Bed, CheckCircle2, Home, Plus, X, XCircle } from 'lucide-react';
+import { Bed, CheckCircle2, Home, Trash2Icon, XCircle } from 'lucide-react';
 
 import FileUpload from "./file-upload";
 
@@ -41,6 +41,9 @@ export type PropertyForm = {
     features: string[];
     imageIds: {
         id: string;
+    }[];
+    newImageIds: {
+        id: string;
         serverId: string;
     }[];
 };
@@ -63,36 +66,36 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-export default function Index({featuresList}: {featuresList: PropertyFeature[]}) {
-    const [feature, setFeature] = useState('')
+export default function Show({
+    featuresList,
+    property
+}: {
+    featuresList: PropertyFeature[],
+    property: Property
+}) {
     const { flash } = usePage<SharedData>().props
-    const {data, setData, processing, errors, post, reset} = useForm<Required<PropertyForm>>({
-        title: '',
-        short_desc: '',
-        description: '',
-        city: '',
-        neighbourhood: '',
-        type: '',
-        rent: '',
-        deposit: '',
-        suitable_for: '',
-        availability_date: '',
-        rental_status: '',
-        cell_number: '',
-        whatsapp_number: '',
-        features: [],
-        imageIds: [],
+    const [resetFilePond, setResetFilePond] = useState(false)
+
+    const {data, setData, processing, errors, patch, reset} = useForm<Required<PropertyForm>>({
+        title: property.title,
+        short_desc: property.short_desc,
+        description: property.description,
+        city: property.city,
+        neighbourhood: property.neighbourhood,
+        type: property.type,
+        rent: property.rent,
+        deposit: property.deposit,
+        suitable_for: property.suitable_for,
+        availability_date: property.availability_date,
+        rental_status: property.rental_status,
+        cell_number: property.cell_number,
+        whatsapp_number: property.whatsapp_number,
+        features: property.features ? property.features.map(f => String(f.id)) : [],
+        imageIds: property.media ? property.media.map(m => ({
+            id: String(m.id)
+        })) : [],
+        newImageIds: [],
     })
-
-    useEffect(() => {
-        if (flash.success) {
-            toast.success(flash.success);
-        }
-
-        if (flash.error) {
-            toast.error(flash.error);
-        }
-    }, [flash.success, flash.error]);
 
     const handleProcess = (error: any, file: any) => {
         if (error) {
@@ -109,47 +112,56 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
             id: file.id,
             serverId: file.serverId,
         };
-        setData('imageIds', [...data.imageIds, fileId]);
+        setData('newImageIds', [...data.newImageIds, fileId]);
     };
 
     const handleRemove = (file: any) => {
         const removedId = file.id;
         setData(
-            'imageIds',
-            data.imageIds.filter(imgObj => imgObj.id !== removedId)
+            'newImageIds',
+            data.newImageIds.filter(imgObj => imgObj.id !== removedId)
         );
         return true;
     };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        
-        post(route('my.properties.store'),{
+
+        patch(route('my.properties.update', property.id),{
             onSuccess: () => {
                 reset()
-            }
+                setResetFilePond(true)
+            },
+            preserveState: false
         });
     }
 
-    const addFeature = () => {
-        if (!feature.trim()) {
-            return; // Do not add empty features
+    // Reset the FilePond reset trigger
+    useEffect(() => {
+        if (resetFilePond) {
+            const timer = setTimeout(() => setResetFilePond(false), 100)
+            return () => clearTimeout(timer)
         }
-        setData('features', [...data.features, feature]);
-        setFeature('');
-    }
+    }, [resetFilePond])
 
-    const removeFeature = (index: number) => {
-        const updatedFeatures = data.features.filter((_, i) => i !== index);
-        setData('features', updatedFeatures);
-    }
+    useEffect(() => {
+        if (flash.success) {
+            toast.success(flash.success);
+            setResetFilePond(true);
+        }
+
+        if (flash.error) {
+            toast.error(flash.error);
+            console.error(flash.error);
+        }
+    }, [flash.success, flash.error]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Add Property" />
+            <Head title="Edit Property" />
             
             <div className="px-4 py-6">
-                <Heading title="Add Property" description="Add your property's title, type, price and features" />
+                <Heading title="Edit Property" description="Edit your property's title, type, price and features" />
 
                 <form onSubmit={submit}>
                     <div className="grid gap-4">
@@ -311,6 +323,7 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
 
                                 <Select
                                     onValueChange={(value) => { setData('rental_status', value); }}
+                                    defaultValue={data.rental_status}
                                 >
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Rental Status" />
@@ -367,6 +380,7 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                                 <Label htmlFor="type">Property Type</Label>
                                 <Select
                                     onValueChange={(value) => { setData('type', value); }}
+                                    defaultValue={data.type}
                                 >
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Property Type" />
@@ -409,27 +423,105 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                         </div>
 
                         <div className="grid gap-3">
-                            <Label htmlFor="description">Images of the Property</Label>
-                            <p className="text-muted-foreground text-sm">At least 1 image of your property</p>
+                            <Label htmlFor="#">Property Images</Label>
+                            <div>
+                                {property.media && property.media.length > 0 ? (
+                                    <div className="grid md:grid-cols-2 gap-2">
+                                        {property.media.map((mediaItem, ndx) => {
+                                            const isFeatured = property.featured_image_id ? Number(property.featured_image_id) === Number(mediaItem.id) : ndx === 0;
+                                            
+                                            return <div key={mediaItem.id} className={`border ${isFeatured && `border-accent-foreground border-4`} rounded p-1 relative overflow-hidden`}>
+                                                <img 
+                                                    src={mediaItem.original_url} 
+                                                    alt={`Property image preview number ${mediaItem.id}`}
+                                                    className='aspect-video w-full object-contain rounded'   
+                                                />
+                                                {isFeatured && <div className='absolute text-muted-foreground text-sm bottom-0 left-0 bg-background p-1 border-accent-foreground border-t-4 border-r-4 rounded-tr'>
+                                                    Featured Image
+                                                </div>}
+
+                                                {!isFeatured && 
+                                                    <Button 
+                                                        variant='outline' 
+                                                        type='button'
+                                                        className='absolute bottom-0 left-0 rounded-xs text-sm text-muted-foreground p-1'
+                                                        onClick={() => {
+                                                            if(confirm('Set this image as the featured image?')) {
+                                                                router.visit(route('my.properties.media.featured', [property.id, mediaItem.id]), {
+                                                                    method: 'post',
+                                                                    preserveScroll: true,
+                                                                });
+                                                            }
+                                                        }}
+                                                    >
+                                                        Set Featured Image
+                                                    </Button>
+                                                }
+
+                                                <div 
+                                                    className='absolute top-0 right-0 bg-background p-1 border rounded-bl cursor-pointer'
+                                                    onClick={() => {
+                                                        if(confirm('Are you sure you want to delete this image?')) {
+                                                            router.visit(route('my.properties.media.destroy', [property.id, mediaItem.id]), {
+                                                                method: 'delete',
+                                                                preserveScroll: true,
+                                                            });
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2Icon 
+                                                        size={20} 
+                                                        className='not-dark:text-red-600 dark:text-red-400' 
+                                                    />
+                                                </div>
+                                                
+                                            </div>
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">No images uploaded yet.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="grid gap-3">
+                            <Label htmlFor="description">Add more images</Label>
                             <FileUpload 
                                 handleProcess={handleProcess} 
                                 handleRemove={handleRemove}
-                                resetTrigger={false} 
+                                resetTrigger={resetFilePond}
                             />
-                            <InputError message={errors.imageIds} className="mt-2" />
+                            <InputError message={errors.newImageIds} className="mt-2" />
                         </div>
                     </div>
-                    <div className='flex items-center justify-start gap-2 mt-4'>
-                        <Button 
-                            variant="outline"
+                    <div className='flex flex-row-reverse items-center justify-between gap-2 mt-4'>
+                        <div className='flex items-center gap-2'>
+                            <Button 
+                                variant="outline"
+                                type='button'
+                                onClick={() => {
+                                    reset()
+                                    history.back()
+                                }}
+                                className='cursor-pointer'
+                                disabled={processing}
+                            >Cancel</Button>
+                            <Button type="submit" className='cursor-pointer'>Save</Button>
+                        </div>
+                        <Button
                             type='button'
+                            className='cursor-pointer'
+                            variant="destructive"
                             onClick={() => {
-                                reset()
-                                history.back()
+                                if(confirm('Are you sure you want to delete this property?')) {
+                                    router.visit(route('my.properties.destroy', property.id), {
+                                        method: 'delete',
+                                    });
+                                }
                             }}
-                            disabled={processing}
-                        >Cancel</Button>
-                        <Button type="submit">Add Property</Button>
+                        >
+                            Delete
+                        </Button>
                     </div>
                 </form>
 

@@ -26,6 +26,7 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    flash: { success?: string; error?: string };
     csrf_token: string;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
@@ -89,8 +90,10 @@ export interface Property {
     deposit: number;
     suitable_for: string;
     availability_date: string;
-    status: string;
-    contact_number: string;
+    rental_status: string;
+    cell_number: string;
+    whatsapp_number: string;
+    featured_image_id: number | null;
     created_at: string;
     updated_at: string;
     media: PropertyMedia[];
@@ -99,7 +102,9 @@ export interface Property {
 
 export interface PropertyFeature {
     id: number;
-    feature: string;
+    name: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface FiltersForm {
