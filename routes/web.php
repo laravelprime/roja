@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('home');
 })->name('home');
 
 Route::resource('properties', PropertyController::class)
     ->only(['index', 'show']);
 
 Route::get('/contact', function () {
-    return "Contacts Page";
+    abort(404);
 })->name('contact');
 
 Route::redirect('/dashboard', '/my/properties/')->name('dashboard');

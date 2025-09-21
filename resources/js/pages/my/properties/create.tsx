@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select"
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { FilePondErrorDescription } from 'filepond';
 
 
 export type PropertyForm = {
@@ -95,8 +96,10 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
     }, [flash.success, flash.error]);
 
     const handleProcess = (error: any, file: any) => {
+        // console.log(error);
+
         if (error) {
-            console.error('Upload failed', error);
+            // console.error('Upload failed', error);
             return;
         }
         
@@ -121,6 +124,27 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
         return true;
     };
 
+    const labelFileProcessingError = (error : FilePondErrorDescription) => {
+        console.log(error.code);
+
+        let errorMessage = '';
+        switch (error.code) {
+            case 499:
+                errorMessage = 'No image file was uploaded. Please select an image to upload.';
+                break;
+            case 498:
+                errorMessage = 'Only jpg, jpeg, png, gif, svg are allowed.';
+                break;
+            case 497:
+                errorMessage = 'Image file is too large. Maximum allowed size is 2MB.';
+                break;
+            default:
+                errorMessage = 'File upload failed. Please try again.';
+        }
+
+        return errorMessage;
+    }
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         
@@ -143,6 +167,8 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
         const updatedFeatures = data.features.filter((_, i) => i !== index);
         setData('features', updatedFeatures);
     }
+
+    const { csrf_token } = usePage<SharedData>().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -414,7 +440,8 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                             <FileUpload 
                                 handleProcess={handleProcess} 
                                 handleRemove={handleRemove}
-                                resetTrigger={false} 
+                                resetTrigger={false}
+                                labelFileProcessingError={labelFileProcessingError}
                             />
                             <InputError message={errors.imageIds} className="mt-2" />
                         </div>

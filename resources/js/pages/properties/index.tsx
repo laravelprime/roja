@@ -1,12 +1,6 @@
-import Heading from '@/components/heading';
-import AppLayout from '@/layouts/app-layout';
 import { LaravelPaginatedResponse, Property, PropertyFeature, type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { Button } from "@/components/ui/button"
-import { Plus } from 'lucide-react';
-import PropertyCard from '../my/properties/property-card';
+import { Head } from '@inertiajs/react';
 import NavBar from '@/components/roja/nav-bar';
-import MainMenu from '@/components/roja/mobile-menu';
 import Footer from '@/components/roja/footer';
 import PropertyListing from '@/components/roja/property/property-listing';
 

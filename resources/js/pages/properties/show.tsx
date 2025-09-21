@@ -5,11 +5,11 @@ import Footer from '@/components/roja/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Button } from '@/components/ui/button';
 import { LayoutGrid, Phone } from 'lucide-react';
-import ImageGallery from '@/components/roja/property/image-gallery';
 import { FaWhatsapp } from 'react-icons/fa';
 import HeadingSmall from '@/components/heading-small';
 import { Head } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
+import PropertyImageGallery from '@/components/roja/property/property-image-gallery';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -45,7 +45,7 @@ export default function Show({
             <div className="px-2 sm:px-4 md:px-16 lg:px-24">
                 <Heading title={property.title} description={property.short_desc} />
                 
-                <ImageGallery property={property} />
+                <PropertyImageGallery property={property} />
 
                 <div className='md:grid grid-cols-3 my-4 md:my-8'>
                     <div className='md:col-span-2'>
@@ -53,7 +53,7 @@ export default function Show({
                         
                         <div className="mt-4 inline-flex gap-2">
                             <HeadingSmall title="Availabitity Status"/>
-                            {property.status === 'available' ?
+                            {property.rental_status === 'available' ?
                                 <Badge variant="default">Available</Badge> :
                                 <Badge variant="secondary">Unavailable</Badge>
                             }
@@ -74,9 +74,9 @@ export default function Show({
                         <div className='mt-4'>
                             <HeadingSmall title="Property Features"/>
                             <ul className="list-disc pl-5 mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {property.features.map((feature, index) => (
-                                    <li key={index} className="text-muted-foreground">
-                                        {feature.feature}
+                                {property.features.map((feature) => (
+                                    <li key={feature.id} className="text-muted-foreground">
+                                        {feature.name}
                                     </li>
                                 ))}
                             </ul>
@@ -93,13 +93,13 @@ export default function Show({
                         </div>
                         <p className="text-sm text-muted-foreground mb-4">For inquiries, please contact the landlord.</p>
                         <div className='grid grid-cols-2 gap-2'>
-                            <a href={`tel:${property.contact_number.split(' ').join('')}`} target="_blank" className="hover:underline">
+                            <a href={`tel:${property.cell_number.split(' ').join('')}`} target="_blank" className="hover:underline">
                                 <Button variant="secondary" className="w-full">
                                     <Phone className="mr-2" />
                                     Call
                                 </Button>
                             </a>
-                            <a href={`https://wa.me/${property.contact_number.split(' ').join('')}??text=I'm%20inquiring%20about%20the%20property%20listing`} target="_blank" className="text-blue-600 hover:underline">
+                            <a href={`https://wa.me/${property.whatsapp_number.split(' ').join('')}??text=I'm%20inquiring%20about%20the%20property%20listing`} target="_blank" className="text-blue-600 hover:underline">
                                 <Button variant="default" className="w-full">
                                     <FaWhatsapp size={24} className=""/>
                                     Whatspp
@@ -121,13 +121,13 @@ export default function Show({
                             </div>
                             <p className="text-sm text-muted-foreground mb-4">For inquiries, please contact the landlord.</p>
                             <div className='grid grid-cols-2 gap-2'>
-                                <a href={`tel:${property.contact_number.split(' ').join('')}`} target="_blank" className="text-blue-600 hover:underline">
+                                <a href={`tel:${property.cell_number.split(' ').join('')}`} target="_blank" className="text-blue-600 hover:underline">
                                     <Button variant="secondary" className="w-full">
                                         <Phone className="mr-2" />
                                         Call
                                     </Button>
                                 </a>
-                                <a href={`https://wa.me/${property.contact_number.split(' ').join('')}?text=I'm%20inquiring%20about%20the%20property%20listing`} target="_blank" className="text-blue-600 hover:underline">
+                                <a href={`https://wa.me/${property.whatsapp_number.split(' ').join('')}?text=I'm%20inquiring%20about%20the%20property%20listing`} target="_blank" className="text-blue-600 hover:underline">
                                     <Button variant="default" className="w-full">
                                         <FaWhatsapp size={24} className=""/>
                                         Whatspp

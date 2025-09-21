@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card"
 
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Building2 } from 'lucide-react';
+import { MapPin, Building2, XCircle, CheckCircle2 } from 'lucide-react';
 import { Property } from "@/types";
 import { formatDistanceToNow } from 'date-fns';
 
@@ -46,8 +46,14 @@ export default function PropertyCard({
                         </span>
                     </p>
                     {property.rental_status === 'available' ?
-                        <Badge variant="default">Available</Badge> :
-                        <Badge variant="secondary">Unavailable</Badge>
+                        <Badge variant="default">
+                            <CheckCircle2/>
+                            <span>Available</span>
+                        </Badge> :
+                        <Badge variant="secondary" className="not-dark:bg-red-100 dark:bg-red-700">
+                            <XCircle className='not-dark:text-red-600 dark:text-red-200'/>
+                            <span className='not-dark:text-red-600 dark:text-red-200'>Occupied</span>
+                        </Badge>
                     }
                 </div>
                 <div className="flex items-center justify-between">

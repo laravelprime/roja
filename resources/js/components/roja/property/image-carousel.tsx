@@ -12,15 +12,17 @@ import { Property } from "@/types"
 
 export function ImageCarousel({property}: {property: Property}) {
   return (
-    <Carousel className="w-full md:max-w-md">
+    <Carousel className="w-screen h-screen max-w-xs ">
       <CarouselContent>
         {property.media.map((media, index) => (
           <CarouselItem key={index}>
-            <img
+            <div className="w-full h-full flex">
+              <img
                 src={media.original_url}
                 alt={`Property image ${index + 1}`}
-                className="w-full h-auto object-contain"
-            />
+                className="h-screen object-contain"
+              />
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>

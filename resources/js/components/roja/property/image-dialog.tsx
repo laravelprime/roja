@@ -20,8 +20,9 @@ export function ImageDialog({ DialogTriggerBtn, property }: { DialogTriggerBtn: 
             <DialogTrigger asChild>
                 {DialogTriggerBtn}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]  p-0 rounded-none grid place-items-center">
+            <DialogContent className="min-w-screen h-screen bg-oange-200 p-0 grid place-items-center rounded-none">
                 <ImageCarousel property={property} />
+                {/* <img className="h-screen" src="http://localhost:8000/storage/476/9.jpg" alt="" /> */}
             </DialogContent>
         </Dialog>
     )

@@ -14,6 +14,7 @@ import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import { SharedData } from '@/types';
+import { error } from 'console';
 
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
@@ -22,13 +23,16 @@ registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 interface FileUploadProps {
     handleProcess: any,
     handleRemove?: any,
-    resetTrigger: boolean
+    resetTrigger: boolean,
+    fileProcessingError?: string,
+    labelFileProcessingError?: string
 }
 
 export default function FileUpload({
     handleProcess,
     handleRemove,
-    resetTrigger = false
+    resetTrigger = false,
+    labelFileProcessingError
 }: FileUploadProps) {
     const [files, setFiles] = useState([]);
     const { csrf_token } = usePage<SharedData>().props;
@@ -43,6 +47,7 @@ export default function FileUpload({
         <div>
             <FilePond
                 files={files}
+                labelFileProcessingError={labelFileProcessingError}
                 onupdatefiles={setFiles}
                 onprocessfile={handleProcess}
                 beforeRemoveFile={handleRemove}

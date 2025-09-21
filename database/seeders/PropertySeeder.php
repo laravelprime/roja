@@ -53,6 +53,8 @@ class PropertySeeder extends Seeder
                         ->toMediaCollection('property_images');
                 }
             }
+            $property->featured_image_id = $property->getFirstMedia('property_images')->id;
+            $property->save();
         }
     }
 }

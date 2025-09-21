@@ -5,7 +5,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { Button } from "@/components/ui/button"
 import { Plus } from 'lucide-react';
 
-import FilterPane from './filter-pane';
 import PropertyCard from './property-card';
 import PropertyListingPagination from '@/components/roja/property/property-listing-pagination';
 import { useEffect } from 'react';

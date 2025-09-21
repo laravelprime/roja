@@ -72,7 +72,7 @@ interface PropertyMedia {
 interface PropertyFeature {
   id: number;
   property_id: number;
-  feature: string;
+  name: string;
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
 };
@@ -98,6 +98,7 @@ export interface Property {
     updated_at: string;
     media: PropertyMedia[];
     features: PropertyFeature[];
+    featuredImage?: PropertyMedia
 }
 
 export interface PropertyFeature {
@@ -113,7 +114,7 @@ export interface FiltersForm {
     neighbourhood: string;
     priceRange: [number, number];
     depositRange: [number, number];
-    features: string[];
+    features: number[];
     sortBy: string;
 }
 

@@ -37,7 +37,7 @@ class PropertyController extends Controller
             'sortBy'
         ]);
 
-        $query = Property::with(['media', 'features']);
+        $query = Property::with(['media', 'features', 'featuredImage']);
 
         if (!empty($filters['propertyType'])) {
             $query->whereIn('type', $filters['propertyType']);
@@ -61,11 +61,11 @@ class PropertyController extends Controller
             $query->whereBetween('deposit', [$minDeposit, $maxDeposit]);
         }
 
-        if (!empty($filters['features'])) {
-            $query->whereHas('features', function ($q) use ($filters) {
-                $q->whereIn('feature', $filters['features']);
-            });
-        }
+        // if (!empty($filters['features'])) {
+        //     $query->whereHas('features', function ($q) use ($filters) {
+        //         $q->whereIn('feature', $filters['features']);
+        //     });
+        // }
 
         if (!empty($filters['sortBy'])) {
             switch ($filters['sortBy']) {
@@ -88,13 +88,13 @@ class PropertyController extends Controller
                     $query->orderBy('neighbourhood', 'desc');
                     break;
             }
+        } else {
+            $query->orderBy('created_at', 'desc');
         }
 
-        $properties = $query->paginate(10);
+        $properties = $query->paginate(12);
        
-        $propertyFeatures = PropertyFeature::select('feature')
-            ->distinct()
-            ->get();
+        $propertyFeatures = PropertyFeature::all();
         
         return inertia('properties/index', [
             'properties' => $properties,
@@ -113,6 +113,6 @@ class PropertyController extends Controller
     }
     
     public function store(Request $request){
-        dd($request->all());
+        
     }
 }

@@ -12,16 +12,20 @@ import { router, useForm } from "@inertiajs/react";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 export default function FilterPane({
     propertyFeatures,
-    data,
-    setData,
-    processing
+    className
 }: {
     propertyFeatures: PropertyFeature[],
-    data: FiltersForm,
-    setData: any,
-    processing: boolean
+    className?: string
 }) {
     const propertyTypes = [{
         value: 'house',
@@ -30,6 +34,21 @@ export default function FilterPane({
         value: 'room',
         label: 'Room'
     }];
+
+    const minPrice = 0;
+        const maxPrice = 5000;
+        const minDeposit = 0;
+        const maxDeposit = 5000;
+        
+        const { data, setData, processing, errors } = useForm<Required<FiltersForm>>({
+            propertyType: [],
+            city: '',
+            neighbourhood: '',
+            priceRange: [minPrice, maxPrice],
+            depositRange: [minDeposit, maxDeposit],
+            features: [],
+            sortBy: 'date_posted_newest',
+        });
 
     const [isApplyingFilters, setIsApplyingFilters] = useState(false)
     const [isResettingFilters, setIsResettingFilters] = useState(false)
@@ -44,18 +63,8 @@ export default function FilterPane({
         while (true) {
             const value = urlParams.get(`features[${index}]`);
             if (value === null) break;
-            features.push(value);
+            features.push(Number(value));
             index++;
-        }
-
-        const propertyRooms : string[] = [];
-        let ndex = 0;
-
-        while (true) {
-            const value = urlParams.get(`propertyRooms[${ndex}]`);
-            if (value === null) break;
-            features.push(value);
-            ndex++;
         }
 
         const propertyTypes = [];
@@ -104,25 +113,47 @@ export default function FilterPane({
         setIsApplyingFilters(true)
         e.preventDefault();
 
-        router.get('/properties', prepFilters(data), {replace: true, preserveState: true, preserveScroll: true});
+        router.get('/properties', prepFilters(data), {replace: true, preserveState: false, preserveScroll: true});
     };
 
     const resetFilters = () => {
         setIsResettingFilters(true)
         
-        router.visit('properties.index', {
+        router.visit('/properties', {
             method: 'get',
         });
     };
     
     return (
-        <div className="self-start border border-sidebar-border/50 p-3 rounded-xl">
+        <div className={`${className} self-start border border-sidebar-border/50 p-3 rounded-xl`}>
             <Heading 
                 title="Filter Properties" 
                 description="Use the filters below to narrow down your search results."
             />
             <form className="flex flex-col gap-6" onSubmit={applyFilters}>
                 <div className="grid gap-6">
+                    <div>
+                        <Label htmlFor="sortBy">Sort By</Label>
+                        <Select
+                            value={data.sortBy}
+                            onValueChange={(value) => {
+                                setData('sortBy', value);
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Sort By" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="rent_low_to_high">Rent: Low to High</SelectItem>
+                                <SelectItem value="rent_high_to_low">Rent: High to Low</SelectItem>
+                                <SelectItem value="date_posted_newest">Date Posted: Newest</SelectItem>
+                                <SelectItem value="date_posted_oldest">Date Posted: Oldest</SelectItem>
+                                <SelectItem value="neighbourhood_az">Neighbourhood: A-Z</SelectItem>
+                                <SelectItem value="neighbourhood_za">Neighbourhood: Z-A</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <div className="grid gap-2">
                         <Label htmlFor="propertyType">Property Type</Label>
                         
@@ -183,20 +214,25 @@ export default function FilterPane({
                         <div className="flex items-center">
                             <Label htmlFor="password">Price Range (USD/month)</Label>
                         </div>
-                        <Slider
-                            value={data.priceRange}
-                            onValueChange={(value) => setData('priceRange', value as [number, number])}
-                            min={data.priceRange[0]}
-                            max={data.priceRange[1]} 
-                            step={1} 
-                            minStepsBetweenThumbs={1}
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                            {/* Example: Render 10 evenly spaced price marks */}
-                            {[...Array(11)].map((_, i) => {
-                                const value = Math.round(data.priceRange[0] + ((data.priceRange[1] - data.priceRange[0]) / 10) * i);
-                                return <span key={value}>{value}</span>;
-                            })}
+                        <div className="flex space-x-2">
+                            <Input 
+                                placeholder="MIN" 
+                                type="number"
+                                value={data.priceRange[0]}
+                                onChange={(e) => { setData('priceRange', [
+                                    Number(e.target.value),
+                                    data.priceRange[1]
+                                ])}} 
+                            />
+                            <Input 
+                                placeholder="MAX" 
+                                type="number"
+                                value={data.priceRange[1]}
+                                onChange={(e) => { setData('priceRange', [
+                                    data.priceRange[0],
+                                    Number(e.target.value)
+                                ])}} 
+                            />
                         </div>
                         <InputError message={''} />
                     </div>
@@ -205,20 +241,25 @@ export default function FilterPane({
                         <div className="flex items-center">
                             <Label htmlFor="password">Deposit Range (USD/month)</Label>
                         </div> 
-                        <Slider
-                            value={data.depositRange}
-                            onValueChange={(value) => setData('depositRange', value as [number, number])}
-                            min={data.depositRange[0]}
-                            max={data.depositRange[1]} 
-                            step={1} 
-                            minStepsBetweenThumbs={1}
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                            {/* Example: Render 10 evenly spaced price marks */}
-                            {[...Array(11)].map((_, i) => {
-                                const value = Math.round(data.depositRange[0] + ((data.depositRange[1] - data.depositRange[0]) / 10) * i);
-                                return <span key={value}>{value}</span>;
-                            })}
+                        <div className="flex space-x-2">
+                            <Input 
+                                placeholder="MIN" 
+                                type="number"
+                                value={data.depositRange[0]}
+                                onChange={(e) => { setData('depositRange', [
+                                    Number(e.target.value),
+                                    data.depositRange[1]
+                                ])}} 
+                            />
+                            <Input 
+                                placeholder="MAX" 
+                                type="number"
+                                value={data.depositRange[1]}
+                                onChange={(e) => { setData('depositRange', [
+                                    data.depositRange[0],
+                                    Number(e.target.value)
+                                ])}} 
+                            />
                         </div>
                         <InputError message={''} />
                     </div>
@@ -227,23 +268,23 @@ export default function FilterPane({
                         <div className="flex items-center mb-2">
                             <Label>Advanced Features</Label>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-4">
                             {propertyFeatures.map((feature) => (
-                                <div key={feature.feature} className="flex items-center space-x-3">
+                                <div key={feature.id} className="flex items-center space-x-3">
                                     <Checkbox
-                                        id={feature.feature}
-                                        name={feature.feature}
-                                        checked={data.features.includes(feature.feature)}
+                                        id={feature.name}
+                                        name={feature.name}
+                                        checked={data.features.includes(feature.id)}
                                         onClick={() => {
-                                            if(data.features.includes(feature.feature)) {
-                                                setData('features', data.features.filter(type => type !== feature.feature));
+                                            if(data.features.includes(feature.id)) {
+                                                setData('features', data.features.filter(feature_id => feature_id !== feature.id));
                                             }else {
-                                                setData('features', [...data.features, feature.feature]);
+                                                setData('features', [...data.features, feature.id]);
                                             }
                                         }}
                                         tabIndex={3}
                                     />
-                                    <Label className="text-muted-foreground" htmlFor={feature.feature}>{feature.feature}</Label>
+                                    <Label className="text-muted-foreground" htmlFor={feature.name}>{feature.name}</Label>
                                 </div>
                             ))}
                         </div>

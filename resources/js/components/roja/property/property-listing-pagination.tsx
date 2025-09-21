@@ -10,7 +10,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
-export default function PropertyListingPagination({ properties }: { properties: LaravelPaginatedResponse<Property> }) {
+export default function PropertyListingPagination({ 
+	properties 
+}: { 
+	properties: LaravelPaginatedResponse<Property> 
+}) {
 	return (
 		<Pagination>
 			<PaginationContent>
@@ -24,10 +28,14 @@ export default function PropertyListingPagination({ properties }: { properties: 
 					)}
 				</PaginationItem>
 
-				{properties.prev_page_url && (<PaginationItem>
-					<PaginationLink href={properties.prev_page_url}>
-						{properties.current_page - 1}
+				{properties.current_page !== 1 && (<PaginationItem>
+					<PaginationLink href={properties.first_page_url}>
+						1
 					</PaginationLink>
+				</PaginationItem>)}
+
+				{properties.current_page - 1 > 1 && (<PaginationItem>
+					<strong>. . . . . . . .</strong>
 				</PaginationItem>)}
 
 				<PaginationItem>
@@ -36,9 +44,13 @@ export default function PropertyListingPagination({ properties }: { properties: 
 					</PaginationLink>
 				</PaginationItem>
 
-				{properties.next_page_url && (<PaginationItem>
-					<PaginationLink href={properties.next_page_url}>
-						{properties.current_page + 1}
+				{properties.last_page - properties.current_page > 1 &&(<PaginationItem>
+					<strong>. . . . . . . .</strong>
+				</PaginationItem>)}
+
+				{properties.current_page !== properties.last_page && (<PaginationItem>
+					<PaginationLink href={properties.last_page_url}>
+						{properties.last_page}
 					</PaginationLink>
 				</PaginationItem>)}
 
@@ -47,7 +59,7 @@ export default function PropertyListingPagination({ properties }: { properties: 
 						<PaginationNext href={properties.next_page_url} />
 					) : (
 						<span className="pointer-events-none opacity-50">
-						<PaginationNext href="#" />
+							<PaginationNext href="#" />
 						</span>
 					)}
 				</PaginationItem>
