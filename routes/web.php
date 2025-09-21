@@ -1,16 +1,44 @@
 <?php
 
+use App\Http\Controllers\My\PropertyController as MyPropertyController;
+use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\FilePondUploadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('home');
 })->name('home');
 
+Route::resource('properties', PropertyController::class)
+    ->only(['index', 'show']);
+
+Route::get('/contact', function () {
+    abort(404);
+})->name('contact');
+
+Route::redirect('/dashboard', '/my/properties/')->name('dashboard');
+
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::post('upload', [FilePondUploadController::class, 'store']);
+
+    Route::group([
+        'prefix' => 'my',
+        'as' => 'my.',
+    ],function () {
+        Route::resource('properties', MyPropertyController::class)
+            ->only(['index', 'store', 'create', 'edit', 'destroy', 'update']);
+
+        Route::delete('properties/{property}/media/{media}', [MyPropertyController::class, 'destroyMedia'])
+            ->name('properties.media.destroy');
+        
+        Route::post('properties/{property}/media/{media}/featured', [MyPropertyController::class, 'setFeaturedImage'])
+            ->name('properties.media.featured');
+
+        Route::get('dashboard', function () {
+            return Inertia::render('dashboard');
+        })->name('dashboard');
+    });
 });
 
 require __DIR__.'/settings.php';
