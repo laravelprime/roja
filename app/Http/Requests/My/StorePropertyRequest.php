@@ -51,7 +51,7 @@ class StorePropertyRequest extends FormRequest
                     
                     // Check if the parsed date matches the input (catches invalid dates like 32/13/2025)
                     if ($date->format('d/m/Y') !== $value) {
-                        $fail('The availability date is not a valid date.');
+                        $fail('The availability date must be in the format DD/MM/YYYY.');
                         return;
                     }
                     

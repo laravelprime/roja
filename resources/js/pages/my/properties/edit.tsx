@@ -313,7 +313,7 @@ export default function Show({
                                     value={data.availability_date}
                                     onChange={ e => { setData('availability_date', e.target.value) }} 
                                     disabled={processing}
-                                    placeholder="Now or Future Date"
+                                    placeholder="Now or Future Date e.g 15/08/2024"
                                 />
                                 <InputError message={errors.availability_date} className="mt-2" />
                             </div>
