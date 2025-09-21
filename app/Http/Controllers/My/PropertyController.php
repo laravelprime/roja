@@ -44,6 +44,9 @@ class PropertyController extends Controller
     {
         $validated = $request->validated();
 
+        $validated['availability_date'] = strtolower(trim($validated['availability_date'])) !== 'now' ? \Carbon\Carbon::createFromFormat('d/m/Y', $validated['availability_date'])
+            ->format('Y-m-d') : now()->format('Y-m-d');
+
         try {
             // Save Property Details
             $property = new Property();
@@ -124,6 +127,9 @@ class PropertyController extends Controller
         }
 
         $validated = $request->validated();
+
+        $validated['availability_date'] = strtolower(trim($validated['availability_date'])) !== 'now' ? \Carbon\Carbon::createFromFormat('d/m/Y', $validated['availability_date'])
+            ->format('Y-m-d') : now()->format('Y-m-d');
 
         try {
             // Update Property Details

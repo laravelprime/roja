@@ -327,7 +327,7 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                                     value={data.availability_date}
                                     onChange={ e => { setData('availability_date', e.target.value) }} 
                                     disabled={processing}
-                                    placeholder="Now or Future Date"
+                                    placeholder="Now or Future Date e.g 15/08/2024"
                                 />
                                 <InputError message={errors.availability_date} className="mt-2" />
                             </div>
@@ -435,8 +435,10 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                         </div>
 
                         <div className="grid gap-3">
-                            <Label htmlFor="description">Images of the Property</Label>
-                            <p className="text-muted-foreground text-sm">At least 1 image of your property</p>
+                            <Label htmlFor="description">
+                                Images of the Property
+                            </Label>
+                            <p className="text-muted-foreground text-sm"> 4-8 images required, jpeg/png/gif/svg, Max image size 2MB </p>
                             <FileUpload 
                                 handleProcess={handleProcess} 
                                 handleRemove={handleRemove}
