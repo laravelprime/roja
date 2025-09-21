@@ -28,9 +28,7 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
 
-            'phone' => 'required|string|max:20',
-
-            'role' => 'required|in:landlord,tenant',
+            'cell_number' => 'required|string|max:20',
         ];
     }
 }

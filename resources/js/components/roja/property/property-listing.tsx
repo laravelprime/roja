@@ -28,7 +28,7 @@ export default function PropertyListing({properties, propertyFeatures, className
             />
         </div>
         <div className={`pt-4 pb-8 md:pt-4 md:pb-8 ${className}`}>
-            <PropertyListingPagination properties={properties}/>
+            {properties.data.length !== 0 && <PropertyListingPagination properties={properties}/>}
         </div>
     </>)   
 }

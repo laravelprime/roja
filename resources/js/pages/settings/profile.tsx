@@ -30,8 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     email: string;
-    phone: string;
-    role: string;
+    cell_number: string;
 };
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
@@ -40,8 +39,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
-        phone: auth.user.phone,
-        role: auth.user.role,
+        cell_number: auth.user.cell_number,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -101,29 +99,14 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 id="phone"
                                 type="tel"
                                 className="mt-1 block w-full"
-                                value={data.phone}
-                                onChange={(e) => setData('phone', e.target.value)}
+                                value={data.cell_number}
+                                onChange={(e) => setData('cell_number', e.target.value)}
                                 required
                                 autoComplete="tel"
                                 placeholder="e.g. +263 78 456 7890"
                             />
 
-                            <InputError className="mt-2" message={errors.phone} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="role">Role</Label>
-                            <Input
-                                id="role"
-                                type="text"
-                                className="mt-1 block w-full"
-                                value={data.role}
-                                onChange={(e) => setData('role', e.target.value)}
-                                required
-                                autoComplete="role"
-                                placeholder="Tenant"
-                                disabled
-                            />
+                            <InputError className="mt-2" message={errors.cell_number} />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (

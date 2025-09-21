@@ -55,7 +55,7 @@ export default function Index({
                     <Link href={route('my.properties.create')}>
                         <Button variant="default" className='cursor-pointer'>
                             <Plus/>
-                            Add Listing
+                            Add Property
                         </Button>
                     </Link>
                 </div>
