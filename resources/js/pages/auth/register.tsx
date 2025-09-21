@@ -9,19 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-
 type RegisterForm = {
     name: string;
     email: string;
-    phone: string;
-    role: string;
+    cell_number: string;
     password: string;
     password_confirmation: string;
 };
@@ -30,8 +21,7 @@ export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: '',
         email: '',
-        phone: '',
-        role: '',
+        cell_number: '',
         password: '',
         password_confirmation: '',
     });
@@ -82,34 +72,19 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone">Cell Number</Label>
                         <Input
                             id="phone"
                             type="tel"
                             required
                             tabIndex={3}
                             autoComplete="tel"
-                            value={data.phone ?? ''}
-                            onChange={(e) => setData('phone', e.target.value)}
+                            value={data.cell_number ?? ''}
+                            onChange={(e) => setData('cell_number', e.target.value)}
                             disabled={processing}
                             placeholder="e.g. +263 78 456 7890"
                         />
-                        <InputError message={errors.phone} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="role">Role</Label>
-                        <Select
-                            onValueChange={(value) => { setData('role', value); }}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="landlord">Landlord</SelectItem>
-                                <SelectItem value="tenant">Tenant</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <InputError message={errors.cell_number} />
                     </div>
 
                     <div className="grid gap-2">
