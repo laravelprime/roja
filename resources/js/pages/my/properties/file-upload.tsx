@@ -52,7 +52,7 @@ export default function FileUpload({
                 onprocessfile={handleProcess}
                 beforeRemoveFile={handleRemove}
                 allowMultiple={true}
-                maxFiles={4}
+                maxFiles={8}
                 server={{
                     url: "/upload",
                     revert: null,

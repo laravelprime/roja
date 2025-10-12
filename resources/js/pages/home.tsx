@@ -18,16 +18,26 @@ export default function Home({ latestProperties }: { latestProperties: Array<Pro
                         <div>
                             <h1 className='text-4xl sm:text-4xl font-bold mb-4'>Find your next home. No viewing fees. No deposits. No agents.</h1>
                             <p className='text-lg mb-8 italic'>Roja is a rental platform that connects tenants directly with landlords, cutting out the middleman and saving you money.</p>
-                            <Link href="/register" className='mr-4'>
-                                <Button variant='default'>
-                                    Register
-                                </Button>
-                            </Link>
-                            <Link href={route('properties.index')}>
-                                <Button variant='outline'>
-                                    Browse Properties
-                                </Button>
-                            </Link>
+                            <div className='flex space-x-4'>
+                                <Link href="/register">
+                                    <Button variant='default'>
+                                        Register
+                                    </Button>
+                                </Link>
+                                <div className="relative inline-block">
+                                    <Link 
+                                        className='transition-transform duration-200 ease-in-out inline-block hover:scale-[1.05]'
+                                        href={route('properties.index')}
+                                    >
+                                        <Button variant='outline'>
+                                            Browse Properties
+                                        </Button>
+                                    </Link>
+                                    <span className="text-4xl absolute right-40 top-[50%] -translate-y-[110%] translate-x-10 animate-point rotate-[60deg]">
+                                        👉
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
