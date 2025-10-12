@@ -1,6 +1,6 @@
 import { Mail, Phone } from "lucide-react";
 import AppLogo from "../app-logo";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import Heading from "../heading";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -59,10 +59,22 @@ export default function Footer({className}: FooterProps) {
                         <Link className="hover:underline transition-all" href="/properties">Properties</Link>
                     </li>
                     <li>
-                        <Link className="hover:underline" href="/contact">Contact Us</Link>
+                        <Link 
+                            className="hover:underline" 
+                            href=""
+                            onClick={(e) => {
+                                window.open("https://portfolio.laravelprime.com", "_blank");
+                            }}
+                        >Contact Me</Link>
                     </li>
                     <li>
-                        <Link className="hover:underline" href="/about">About Us</Link>
+                        <Link 
+                            className="hover:underline" 
+                            href=""
+                            onClick={(e) => {
+                                window.open("https://portfolio.laravelprime.com", "_blank");
+                            }}
+                        >About Me</Link>
                     </li>
                 </ul>
             </div>

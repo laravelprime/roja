@@ -7,9 +7,10 @@ use App\Http\Requests\My\StorePropertyRequest;
 use App\Http\Requests\My\UpdatePropertyRequest;
 use App\Models\Property;
 use App\Models\PropertyFeature;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class PropertyController extends Controller
 {
@@ -73,10 +74,14 @@ class PropertyController extends Controller
             // Save Property Images
             if (!empty($validated['imageIds'])) {
                 foreach ($validated['imageIds'] as $imageId) {
-                    $image = collect(\File::files(storage_path('app/private/tmp-files/' . $imageId['serverId'])))->first();
-                    $property->addMedia(storage_path('app/private/tmp-files/' . $imageId['serverId'] . '/' . $image->getFilename()))
-                        ->toMediaCollection('property_images');
-                    rmdir(storage_path('app/private/tmp-files/' . $imageId['serverId']));
+                    $r2Disk = Storage::disk('r2');
+                    $tmpFileDirPath = 'public/tmp-files/property-images/' . $imageId['serverId'];
+                    $imgPath = $r2Disk->files($tmpFileDirPath)[0];
+
+                    $property->addMediaFromDisk($imgPath, 'r2')
+                        ->toMediaCollection('property_images', 'r2');
+
+                    $r2Disk->deleteDirectory($tmpFileDirPath);
                 }
             }
 
@@ -109,6 +114,8 @@ class PropertyController extends Controller
         if ($property->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
+
+        // dd($property->load(['media', 'features'])->toArray());
 
         return inertia('my/properties/edit', [
             'property' => $property->load(['media', 'features']),
@@ -154,10 +161,14 @@ class PropertyController extends Controller
             // Save New Property Images
             if (!empty($validated['newImageIds'])) {
                 foreach ($validated['newImageIds'] as $imageId) {
-                    $image = collect(\File::files(storage_path('app/private/tmp-files/' . $imageId['serverId'])))->first();
-                    $property->addMedia(storage_path('app/private/tmp-files/' . $imageId['serverId'] . '/' . $image->getFilename()))
-                        ->toMediaCollection('property_images');
-                    rmdir(storage_path('app/private/tmp-files/' . $imageId['serverId']));
+                    $r2Disk = Storage::disk('r2');
+                    $tmpFileDirPath = 'public/tmp-files/property-images/' . $imageId['serverId'];
+                    $imgPath = $r2Disk->files($tmpFileDirPath)[0];
+
+                    $property->addMediaFromDisk($imgPath, 'r2')
+                        ->toMediaCollection('property_images', 'r2');
+
+                    $r2Disk->deleteDirectory($tmpFileDirPath);
                 }
             }
 
@@ -190,8 +201,8 @@ class PropertyController extends Controller
             // Delete the property itself
             $property->delete();
 
-            return redirect()->route('my.properties.index')
-                ->with('success', 'Property deleted successfully.');
+            request()->session()->flash('success', 'Property deleted successfully.');
+            return Inertia::location(route('my.properties.index'));
         } catch (\Exception $e) {
             Log::error('Failed to delete property: ' . $e->getMessage());
 
@@ -222,6 +233,12 @@ class PropertyController extends Controller
 
         if($property->featured_image_id === $castedMediaId){
             return redirect()->back()->with(['error' => 'Cannot delete the featured image. Please set another image as featured before deleting this one.']);
+        }
+
+        // 🛑 Refuse deletion if media count is equal to min media count
+        $MIN_MEDIA_COUNT_PER_PROPERTY = 4;
+        if ($property->media()->count() <= $MIN_MEDIA_COUNT_PER_PROPERTY) {
+            return redirect()->back()->with(['error' => 'Cannot delete this image. A property must have at least ' . $MIN_MEDIA_COUNT_PER_PROPERTY . ' images.']);
         }
 
         $mediaItem = $property->media()->where('id', $mediaId)->first();

@@ -34,7 +34,11 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'cell_number' => 'required|string|max:20',
+            'cell_number' => ['required', 'string', 'max:25', 'unique:'.User::class, 'phone'],
+        ], [
+            'cell_number.phone' => 'Please enter a valid phone number.',
+            'cell_number.required' => 'A phone number is required.',
+            'cell_number.unique' => 'This phone number is already registered.',
         ]);
 
         $user = User::create([

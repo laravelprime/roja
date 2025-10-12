@@ -6,8 +6,10 @@ use App\Http\Controllers\FilePondUploadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('home');
+Route::get('/', function () { 
+    return Inertia::render('home', [
+        'latestProperties' => PropertyController::getLatest(3),
+    ]);
 })->name('home');
 
 Route::resource('properties', PropertyController::class)
@@ -20,7 +22,7 @@ Route::get('/contact', function () {
 Route::redirect('/dashboard', '/my/properties/')->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('upload', [FilePondUploadController::class, 'store']);
+    Route::post('upload', [FilePondUploadController::class, 'storeTempImg']);
 
     Route::group([
         'prefix' => 'my',

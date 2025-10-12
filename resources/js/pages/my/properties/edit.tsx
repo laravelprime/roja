@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select"
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { error } from 'console';
 
 
 export type PropertyForm = {
@@ -75,6 +76,7 @@ export default function Show({
 }) {
     const { flash } = usePage<SharedData>().props
     const [resetFilePond, setResetFilePond] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const {data, setData, processing, errors, patch, reset} = useForm<Required<PropertyForm>>({
         title: property.title,
@@ -96,6 +98,8 @@ export default function Show({
         })) : [],
         newImageIds: [],
     })
+
+    console.log(errors)
 
     const handleProcess = (error: any, file: any) => {
         if (error) {
@@ -131,8 +135,7 @@ export default function Show({
             onSuccess: () => {
                 reset()
                 setResetFilePond(true)
-            },
-            preserveState: false
+            }
         });
     }
 
@@ -155,6 +158,17 @@ export default function Show({
             console.error(flash.error);
         }
     }, [flash.success, flash.error]);
+
+    const handlePropertyDelete = () => {
+        if (!confirm('Are you sure you want to delete this property?')) return;
+
+        setIsDeleting(true);
+
+        router.visit(route('my.properties.destroy', property.id), {
+            method: 'delete',
+            onFinish: () => setIsDeleting(false),
+        });
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -492,6 +506,19 @@ export default function Show({
                                 resetTrigger={resetFilePond}
                             />
                             <InputError message={errors.newImageIds} className="mt-2" />
+                            <ul>
+                                {data.imageIds.map((imageId, index) => {
+                                    if(errors[`imageIds.${index}.serverId`]){
+                                        return <li key={index}>
+                                            <InputError 
+                                                message={errors[`imageIds.${index}.serverId`]} 
+                                                className="mt-2" 
+                                            />
+                                        </li>
+                                    }
+                                    return null;
+                                })}
+                            </ul>
                         </div>
                     </div>
                     <div className='flex flex-row-reverse items-center justify-between gap-2 mt-4'>
@@ -506,21 +533,16 @@ export default function Show({
                                 className='cursor-pointer'
                                 disabled={processing}
                             >Cancel</Button>
-                            <Button type="submit" className='cursor-pointer'>Save</Button>
+                            <Button type="submit" className='cursor-pointer' disabled={processing}>Save</Button>
                         </div>
                         <Button
                             type='button'
                             className='cursor-pointer'
                             variant="destructive"
-                            onClick={() => {
-                                if(confirm('Are you sure you want to delete this property?')) {
-                                    router.visit(route('my.properties.destroy', property.id), {
-                                        method: 'delete',
-                                    });
-                                }
-                            }}
+                            disabled={isDeleting} // ✅ disable button while deleting
+                            onClick={handlePropertyDelete}
                         >
-                            Delete
+                            {isDeleting ? 'Deleting...' : 'Delete'}
                         </Button>
                     </div>
                 </form>
