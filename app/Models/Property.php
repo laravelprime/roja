@@ -8,6 +8,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Carbon;
 
 class Property extends Model implements HasMedia
 {
@@ -25,4 +26,10 @@ class Property extends Model implements HasMedia
     {
         return $this->belongsTo(Media::class, 'featured_image_id');
     }
+
+    public function getAvailabilityDateAttribute($value)
+    {
+        return Carbon::parse($value)->format('d/m/Y');
+    }
+
 }

@@ -93,6 +93,8 @@ class PropertyController extends Controller
         }
 
         $properties = $query->paginate(12);
+
+        // dd($properties->first()->toArray());
        
         $propertyFeatures = PropertyFeature::all();
         
@@ -114,5 +116,14 @@ class PropertyController extends Controller
     
     public function store(Request $request){
         
+    }
+
+    public static function getLatest($count = 3){
+        $latestProperties = Property::with(['media', 'features', 'featuredImage'])
+            ->orderBy('created_at', 'desc')
+            ->take($count)
+            ->get();
+        
+        return $latestProperties;
     }
 }

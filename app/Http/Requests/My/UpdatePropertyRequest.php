@@ -4,6 +4,7 @@ namespace App\Http\Requests\My;
 
 use App\Models\PropertyFeature;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UpdatePropertyRequest extends FormRequest
@@ -33,39 +34,43 @@ class UpdatePropertyRequest extends FormRequest
             'rent' => 'required|numeric|min:0',
             'deposit' => 'required|numeric|min:0',
             'suitable_for' => 'required|string|max:100',
-            'availability_date' => ['required', 'string', function ($attribute, $value, $fail) {
-                // Allow "Now" (case-insensitive)
-                if (strtolower(trim($value)) === 'now') {
-                    return;
-                }
-
-                // Validate DD/MM/YYYY format
-                if (!preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $value)) {
-                    $fail('The availability date must be either "Now" or in DD/MM/YYYY format (e.g., 15/08/2025).');
-                    return;
-                }
-
-                // Try to parse as date with specific format
-                try {
-                    $date = \Carbon\Carbon::createFromFormat('d/m/Y', $value)->setTime(0, 0, 0)->setTimezone('UTC');
-                    
-                    // Check if the parsed date matches the input (catches invalid dates like 32/13/2025)
-                    if ($date->format('d/m/Y') !== $value) {
-                        $fail('The availability date is not a valid date.');
+            'availability_date' => [
+                'required', 
+                'string', 
+                function ($attribute, $value, $fail) {
+                    // Allow "Now" (case-insensitive)
+                    if (strtolower(trim($value)) === 'now') {
                         return;
                     }
-                    
-                    // Check if date is in the future or today
-                    if ($date->isPast() && !$date->isToday()) {
-                        $fail('The availability date must be today or a future date.');
+
+                    // Validate DD/MM/YYYY format
+                    if (!preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $value)) {
+                        $fail('The availability date must be either "Now" or in DD/MM/YYYY format (e.g., 15/08/2025).');
+                        return;
                     }
-                } catch (\Exception $e) {
-                    $fail('The availability date must be either "Now" or a valid date in DD/MM/YYYY format.');
+
+                    // Try to parse as date with specific format
+                    try {
+                        $date = \Carbon\Carbon::createFromFormat('d/m/Y', $value)->setTime(0, 0, 0)->setTimezone('UTC');
+                        
+                        // Check if the parsed date matches the input (catches invalid dates like 32/13/2025)
+                        if ($date->format('d/m/Y') !== $value) {
+                            $fail('The availability date is not a valid date.');
+                            return;
+                        }
+                        
+                        // Check if date is in the future or today
+                        if ($date->isPast() && !$date->isToday()) {
+                            $fail('The availability date must be today or a future date.');
+                        }
+                    } catch (\Exception $e) {
+                        $fail('The availability date must be either "Now" or a valid date in DD/MM/YYYY format.');
+                    }
                 }
-            }],
+            ],
             'rental_status' => 'required|string|in:available,occupied',
-            'cell_number' => 'required|string|max:20',
-            'whatsapp_number' => 'nullable|string|max:20',
+            'cell_number' => 'required|string|max:20|phone',
+            'whatsapp_number' => 'nullable|string|max:20|phone',
             'features' => 'required|array|max:20',
             'features.*' => [
                 'required',
@@ -73,7 +78,7 @@ class UpdatePropertyRequest extends FormRequest
                 Rule::in(PropertyFeature::pluck('id')->map(fn($id) => (string)$id)->toArray()),
             ],
             'imageIds' => [
-                'nullable',
+                'required',
                 'array',
             ],
             'newImageIds' => [
@@ -83,21 +88,26 @@ class UpdatePropertyRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $oldImages = is_array(request('imageIds')) ? count(request('imageIds')) : 0;
                     $newImages = is_array($value) ? count($value) : 0;
+
                     if (($oldImages + $newImages) > 8) {
                         $fail('You can only provide up to 8 images in total (existing + new).');
-                    } elseif (($oldImages + $newImages) < 4) {
+                    }
+                    
+                    if (($oldImages + $newImages) < 4) {
                         $fail('You must provide at least 4 images in total (existing + new).');
                     }
                 }
             ],
-            'newImageIds.*.id' => 'required|string',
+            'newImageIds.*.id' => 'string',
             'newImageIds.*.serverId' => [
-                'required',
                 'string',
                 function ($attribute, $value, $fail) {
-                    $tempFilePath = storage_path('app/private/tmp-files/' . $value);
-                    if (!file_exists($tempFilePath)) {
-                        $fail('The uploaded image file does not exist or has expired.');
+                    $r2Disk = Storage::disk('r2');
+                    $tmpFileDirPath = 'public/tmp-files/property-images/' . $value;
+                    $imgPath = $r2Disk->files($tmpFileDirPath);
+
+                    if(empty($imgPath)){
+                        $fail('One of the uploaded images has expired. Clear all images and re-upload them.');
                     }
                 }
             ]
@@ -119,7 +129,9 @@ class UpdatePropertyRequest extends FormRequest
             'features.required' => 'You must select at least 1 feature.',
             'features.max' => 'You can only provide up to 20 features.',
             'type.required' => 'The property type must be either a "room" or "a full house"',
-            'type.in' => 'The property type must be either a "room" or "a full house"'
+            'type.in' => 'The property type must be either a "room" or "a full house"',
+            'cell_number.phone' => 'Please enter a valid phone number.',
+            'whatsapp_number.phone' => 'Please enter a valid phone number.',
         ];
     }
 }

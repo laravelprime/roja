@@ -97,7 +97,7 @@ export interface Property {
     updated_at: string;
     media: PropertyMedia[];
     features: PropertyFeature[];
-    featuredImage?: PropertyMedia
+    featured_image?: PropertyMedia
 }
 
 export interface PropertyFeature {

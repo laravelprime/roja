@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea";
-import { Bed, CheckCircle2, Home, Plus, X, XCircle } from 'lucide-react';
+import { Bed, CheckCircle2, Home, XCircle } from 'lucide-react';
 
 import FileUpload from "./file-upload";
 
@@ -136,7 +136,7 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                 errorMessage = 'Only jpg, jpeg, png, gif, svg are allowed.';
                 break;
             case 497:
-                errorMessage = 'Image file is too large. Maximum allowed size is 2MB.';
+                errorMessage = 'Image file is too large. Maximum allowed size is 10MB.';
                 break;
             default:
                 errorMessage = 'File upload failed. Please try again.';
@@ -154,21 +154,6 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
             }
         });
     }
-
-    const addFeature = () => {
-        if (!feature.trim()) {
-            return; // Do not add empty features
-        }
-        setData('features', [...data.features, feature]);
-        setFeature('');
-    }
-
-    const removeFeature = (index: number) => {
-        const updatedFeatures = data.features.filter((_, i) => i !== index);
-        setData('features', updatedFeatures);
-    }
-
-    const { csrf_token } = usePage<SharedData>().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -446,6 +431,20 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                                 labelFileProcessingError={labelFileProcessingError}
                             />
                             <InputError message={errors.imageIds} className="mt-2" />
+                            <ul>
+                                {data.imageIds.map((imageId, index) => {
+                                    if(errors[`imageIds.${index}.serverId`]){
+                                        return <li key={index}>
+                                            <InputError 
+                                                message={errors[`imageIds.${index}.serverId`]} 
+                                                className="mt-2" 
+                                            />
+                                        </li>
+                                    }
+                                    return null;
+                                })}
+                            </ul>
+                            
                         </div>
                     </div>
                     <div className='flex items-center justify-start gap-2 mt-4'>
@@ -458,7 +457,7 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                             }}
                             disabled={processing}
                         >Cancel</Button>
-                        <Button type="submit">Add Property</Button>
+                        <Button type="submit" disabled={processing}>Add Property</Button>
                     </div>
                 </form>
 

@@ -28,7 +28,7 @@ const navlinks = [
     },
     {
         title: "Contact",
-        href: "/contact",
+        href: "",
         icon: <Phone size={16} />
     },
 ];
@@ -53,7 +53,14 @@ export default function NavBar({ className }: NavBarProps) {
                     {navlinks.map((link) => (
                         <NavigationMenuItem key={link.title}>
                             <NavigationMenuLink asChild>
-                                <Link href={link.href}>{link.title}</Link>
+                                {link.title === 'Contact' ? <Link  
+                                    href={link.href}
+                                    onClick={(e) => {
+                                        window.open("https://portfolio.laravelprime.com", "_blank");
+                                    }}
+                                >{link.title}</Link> : <Link href={link.href}>
+                                    {link.title}
+                                </Link>}
                             </NavigationMenuLink>
                         </NavigationMenuItem>
                     ))}

@@ -28,7 +28,19 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
 
-            'cell_number' => 'required|string|max:20',
+            'cell_number' => ['required', 'string', 'max:25', 'unique:'.User::class, 'phone'],
+        ];
+    }
+
+    /*
+    * Custom error messages for validation
+    */ 
+    public function messages()
+    {
+        return [
+            'cell_number.phone' => 'Please enter a valid phone number.',
+            'cell_number.required' => 'A phone number is required.',
+            'cell_number.unique' => 'This phone number is already registered.',
         ];
     }
 }

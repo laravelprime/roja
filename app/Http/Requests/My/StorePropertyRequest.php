@@ -4,6 +4,7 @@ namespace App\Http\Requests\My;
 
 use App\Models\PropertyFeature;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class StorePropertyRequest extends FormRequest
@@ -64,8 +65,8 @@ class StorePropertyRequest extends FormRequest
                 }
             }],
             'rental_status' => 'required|string|in:available,occupied',
-            'cell_number' => 'required|string|max:20',
-            'whatsapp_number' => 'nullable|string|max:20',
+            'cell_number' => 'required|string|max:25|phone',
+            'whatsapp_number' => 'nullable|string|max:25|phone',
             'features' => 'required|array|max:20',
             'features.*' => [
                 'required',
@@ -75,9 +76,12 @@ class StorePropertyRequest extends FormRequest
             'imageIds' => 'required|array|min:4',
             'imageIds.*.id' => 'required|string',
             'imageIds.*.serverId' => ['required', 'string', function ($attribute, $value, $fail) {
-                $tempFilePath = storage_path('app/private/tmp-files/' . $value);
-                if (!file_exists($tempFilePath)) {
-                    $fail('The uploaded image file does not exist or has expired.');
+                $r2Disk = Storage::disk('r2');
+                $tmpFileDirPath = 'public/tmp-files/property-images/' . $value;
+                $imgPath = $r2Disk->files($tmpFileDirPath);
+
+                if(empty($imgPath)){
+                    $fail('One of the uploaded images has expired. Clear all images and re-upload them.');
                 }
             }]
         ];
@@ -98,7 +102,9 @@ class StorePropertyRequest extends FormRequest
             'features.required' => 'You must select at least 1 feature.',
             'features.max' => 'You can only provide up to 20 features.',
             'type.required' => 'The property type must be either a "room" or "a full house"',
-            'type.in' => 'The property type must be either a "room" or "a full house"'
+            'type.in' => 'The property type must be either a "room" or "a full house"',
+            'cell_number.phone' => 'Please enter a valid phone number.',
+            'whatsapp_number.phone' => 'Please enter a valid phone number.',
         ];
     }
 }
