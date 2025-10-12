@@ -423,7 +423,7 @@ export default function Index({featuresList}: {featuresList: PropertyFeature[]})
                             <Label htmlFor="description">
                                 Images of the Property
                             </Label>
-                            <p className="text-muted-foreground text-sm"> 4-8 images required, jpeg/png/gif/svg, Max image size 2MB </p>
+                            <p className="text-muted-foreground text-sm"> 4-8 images required, jpeg/png/gif/svg, Max image size 10MB </p>
                             <FileUpload 
                                 handleProcess={handleProcess} 
                                 handleRemove={handleRemove}
